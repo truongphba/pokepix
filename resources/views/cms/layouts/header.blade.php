@@ -1,9 +1,14 @@
 <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
-
+   <div class="text-right" style="width: 100%">
+       <a href="/cms/logout">
+           <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
+           Logout
+       </a>
+   </div>
     <!-- Sidebar Toggle (Topbar) -->
-    <button id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle mr-3">
-        <i class="fa fa-bars"></i>
-    </button>
+{{--    <button id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle mr-3">--}}
+{{--        <i class="fa fa-bars"></i>--}}
+{{--    </button>--}}
 
     <!-- Topbar Search -->
 {{--    <form class="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100 navbar-search">--}}

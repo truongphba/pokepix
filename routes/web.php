@@ -22,3 +22,4 @@ Route::prefix('users')->group(function () {
 });
 Route::get('/login', 'AuthController@login');
 Route::post('/login', 'AuthController@loginProcess');
+Route::get('/logout', 'AuthController@logout');

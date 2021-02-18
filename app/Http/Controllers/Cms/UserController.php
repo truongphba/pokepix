@@ -11,12 +11,16 @@ class UserController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('auth');
+        $this->middleware('auth.cms');
     }
 
-    public function index(){
-        $list = User::orderBy('created_at', 'DESC')->paginate(20);
-        return view('cms.user.index',['list' => $list]);
+    public function index(Request $request){
+        $keyword = $request->get('keyword');
+        $list = User::orderBy('created_at', 'DESC')->where(function ($query) use ($keyword) {
+            $query->where('name', 'like', '%' . $keyword . '%')
+                ->orWhere('device_id', 'like', '%' . $keyword . '%');
+        })->paginate(20)->appends($request->only('keyword'));
+        return view('cms.user.index',['list' => $list, 'keyword' => $keyword]);
     }
 
     public function create(){

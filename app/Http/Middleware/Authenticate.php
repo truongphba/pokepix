@@ -18,9 +18,8 @@ class Authenticate extends Middleware
      */
     protected function redirectTo($request, Closure $next)
     {
-        $accountRole = Account::where('id', Auth::guard('account')->id())->first()->role;
-        if (Auth::guard('account')->check() && $accountRole == 1) {
-            return $next($request);
+        if (! $request->expectsJson()) {
+            return route('login');
         }
     }
 }

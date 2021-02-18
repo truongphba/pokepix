@@ -17,14 +17,21 @@
         <div class="card shadow mb-4">
             <div class="card-header py-3">
                 <div class="row">
-                    <div class="col-md-6 col-6">
+                    <div class="col-md-2 col-3">
                         <h4 class="m-0 font-weight-bold text-primary">User List</h4>
                     </div>
-                    {{--                    <div class="col-md-3">--}}
-                    {{--                        <form method="get" action="">--}}
-                    {{--                            <input class="form-control" name="keyword" placeholder="Search....">--}}
-                    {{--                        </form>--}}
-                    {{--                    </div>--}}
+                    <div class="col-md-4 col-3">
+                        <form class="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100 navbar-search">
+                            <div class="input-group">
+                                <input type="text" class="form-control border-0 small"  name="keyword" value="{{ $keyword }}" placeholder="Search...." aria-label="Search" aria-describedby="basic-addon2">
+                                <div class="input-group-append">
+                                    <button class="btn btn-primary" type="submit">
+                                        <i class="fas fa-search fa-sm"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
                     <div class="col-md-6 col-6 text-right">
                         <a href="/cms/users/create">
                             <button class="btn btn-success text-uppercase">Add</button>
@@ -43,7 +50,6 @@
                             <tr>
                                 <th class="text-center">Id</th>
                                 <th>Name</th>
-                                <th>Avatar</th>
                                 <th>Device Id</th>
                                 <th>Like Count</th>
                                 <th>Created At</th>
@@ -54,7 +60,6 @@
                                 <tr>
                                     <td class="text-center">{{$item->id}}</td>
                                     <td>{{$item->name}}</td>
-                                    <td>{{ $item->avatar }}</td>
                                     <td>{{$item->device_id}}</td>
                                     <td>{{$item->likes_count}}</td>
                                     <td>{{date_format($item->created_at, 'Y-m-d')}}</td>
@@ -63,16 +68,16 @@
                             </tbody>
                         </table>
                     </div>
-                                    <div class="row">
-                                        <div class="col-md-6">
-                                            <p>Showing {{$list->firstItem()}} to {{$list->lastItem()}} of {{$list->total()}} entries</p>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <div class="float-right">
-                                                {{$list->links()}}
-                                            </div>
-                                        </div>
-                                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p>Showing {{$list->firstItem()}} to {{$list->lastItem()}} of {{$list->total()}} entries</p>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="float-right">
+                                {{$list->links()}}
+                            </div>
+                        </div>
+                    </div>
                 @else
                     <h4>Have no user</h4>
                 @endif

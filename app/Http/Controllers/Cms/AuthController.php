@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Cms;
 
+use App\Models\Account;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
@@ -15,6 +16,12 @@ class AuthController extends Controller
 
     public function login()
     {
+        if (Auth::guard('account')->check()) {
+            $accountRole = Account::where('id', Auth::guard('account')->id())->first()->role;
+            if ($accountRole == 1) {
+              return redirect('/cms/users');
+            }
+        }
         return view('cms.login');
     }
 
@@ -34,5 +41,10 @@ class AuthController extends Controller
         } else {
             return redirect()->back()->with('error', 'Username or Password incorrect');
         }
+    }
+
+    public function logout(){
+        Auth::guard('account')->logout();
+        return redirect('/cms/login');
     }
 }
