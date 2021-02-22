@@ -1,17 +1,17 @@
 @extends('cms.layouts.layout')
 
-@section('title','User Management')
+@section('title','Quản Lý User')
 @section('content')
     <div class="container-fluid">
         <!-- Page Heading -->
         <div class="d-sm-flex align-items-center justify-content-between mb-4">
-            <h1 class="h3 mb-0 text-gray-800">User Management</h1>
+            <h1 class="h3 mb-0 text-gray-800">Quản Lý User</h1>
         </div>
 
         <div class="card shadow mb-4">
             <div class="card-header py-3">
                 <div class="row">
-                    <h4 class="m-0 font-weight-bold text-primary">Create User</h4>
+                    <h4 class="m-0 font-weight-bold text-primary">Thêm Mới User</h4>
                 </div>
             </div>
             <div class="card-body">
@@ -49,9 +49,9 @@
                     </div>
                     <div class="form-group">
                         <a href="/cms/users">
-                            <button type="button" class="btn btn-primary text-uppercase">Back</button>
+                            <button type="button" class="btn btn-primary text-uppercase">Quay Lại</button>
                         </a>
-                        <button class="btn btn-success text-uppercase">Submit</button>
+                        <button class="btn btn-success text-uppercase">Gửi</button>
                     </div>
                 </form>
             </div>

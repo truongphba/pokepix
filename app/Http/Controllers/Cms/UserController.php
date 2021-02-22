@@ -31,6 +31,12 @@ class UserController extends Controller
             'name' => 'required',
             'device_id' => 'required',
             'avatar' => 'file|mimes:jpeg,png,jpg|max:1024'
+        ],[
+            'name.required' => 'name bắt buộc phải nhập.',
+            'device_id.required' => 'device_id bắt buộc phải nhập.',
+            'avatar.file' => 'avatar phải có định dạng jpeg, png, jpg',
+            'avatar.mimes' => 'avatar phải có định dạng jpeg, png, jpg',
+            'avatar.max' => 'avatar có kích thước tối đa là 1024kb',
         ]);
         $user = new User();
         if ($request->file('avatar')){
@@ -54,7 +60,7 @@ class UserController extends Controller
 
         $user->save();
 
-        return redirect('/cms/users/'. $user->id)->withSuccess('Adding new user success.');
+        return redirect('/cms/users/'. $user->id)->withSuccess('Thêm mới user thành công.');
     }
 
     public function detail($id){
@@ -72,6 +78,12 @@ class UserController extends Controller
             'name' => 'required',
             'device_id' => 'required',
             'avatar' => 'file|mimes:jpeg,png,jpg|max:1024'
+        ],[
+            'name.required' => 'name bắt buộc phải nhập.',
+            'device_id.required' => 'device_id bắt buộc phải nhập.',
+            'avatar.file' => 'avatar phải có định dạng jpeg, png, jpg',
+            'avatar.mimes' => 'avatar phải có định dạng jpeg, png, jpg',
+            'avatar.max' => 'avatar có kích thước tối đa là 1024kb',
         ]);
 
         $user = User::find($id);
@@ -95,13 +107,13 @@ class UserController extends Controller
         $user->device_id = $request->device_id;
         $user->save();
 
-        return redirect('/cms/users/'. $user->id)->withSuccess('Edit user success.');
+        return redirect('/cms/users/'. $user->id)->withSuccess('Cập nhật user thành công.');
     }
 
     public function delete($id){
         $user = User::find($id);
         $user->delete();
 
-        return redirect('/cms/users/')->withSuccess('Delete user success.');
+        return redirect('/cms/users/')->withSuccess('Xoá user thành công.');
     }
 }

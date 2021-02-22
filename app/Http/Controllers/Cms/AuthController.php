@@ -30,6 +30,9 @@ class AuthController extends Controller
         $request->validate([
             'username' => 'required',
             'password' => 'required',
+        ],[
+            'username.required' => 'Bắt buộc phải nhập tên đăng nhập',
+            'password.required' => 'Bắt buộc phải nhập tên mật khẩu',
         ]);
 
         $login = [
@@ -39,7 +42,7 @@ class AuthController extends Controller
         if (Auth::guard('account')->attempt($login)) {
             return redirect('/cms/users');
         } else {
-            return redirect()->back()->with('error', 'Username or Password incorrect');
+            return redirect()->back()->with('error', 'Tên đăng nhập hoặc mật khẩu không chính xác');
         }
     }
 

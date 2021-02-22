@@ -12,18 +12,18 @@
     <hr class="sidebar-divider my-0">
 
     <!-- Nav Item - Dashboard -->
-    <li class="nav-item active">
-        <a class="nav-link" href="/cms">
-            <i class="fas fa-fw fa-tachometer-alt"></i>
-            <span>Dashboard</span></a>
-    </li>
+{{--    <li class="nav-item active">--}}
+{{--        <a class="nav-link" href="/cms">--}}
+{{--            <i class="fas fa-fw fa-tachometer-alt"></i>--}}
+{{--            <span>Dashboard</span></a>--}}
+{{--    </li>--}}
 
     <!-- Divider -->
     <hr class="sidebar-divider">
 
     <!-- Heading -->
     <div class="sidebar-heading">
-        Management
+        Quản lý
     </div>
 
     <!-- Nav Item - Tables -->
@@ -32,7 +32,11 @@
             <i class="fas fa-fw fa-table"></i>
             <span>User</span></a>
     </li>
-
+    <li class="nav-item">
+        <a class="nav-link" href="/cms/categories/category/list">
+            <i class="fas fa-fw fa-table"></i>
+            <span>Danh mục</span></a>
+    </li>
     <!-- Divider -->
     <hr class="sidebar-divider d-none d-md-block">
 

@@ -6,24 +6,35 @@
         }
     </style>
 @endsection
-@section('title','Quản Lý User')
+@section('title','Quản lý category')
 @section('content')
     <div class="container-fluid">
         <!-- Page Heading -->
         <div class="d-sm-flex align-items-center justify-content-between mb-4">
-            <h1 class="h3 mb-0 text-gray-800">Quản Lý User</h1>
+            <h1 class="h3 mb-0 text-gray-800">Quản Lý Danh Mục</h1>
         </div>
 
         <div class="card shadow mb-4">
             <div class="card-header py-3">
                 <div class="row">
-                    <div class="col-md-4 col-3">
-                        <h4 class="m-0 font-weight-bold text-primary">Danh sách User</h4>
+                    <div class="col-md-3 col-3">
+                        <h4 class="m-0 font-weight-bold text-primary">Danh Sách Danh mục</h4>
                     </div>
-                    <div class="col-md-4 col-3">
-                        <form class="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100 navbar-search">
+                    <div class="col-md-3 col-3">
+                        <select name="categories" id="categories" class="form-control">
+                            @foreach($categories as $category)
+                                <option
+                                    value="{{$category}}" {{$currentCategory == $category ? 'selected' : ''}}>{{$category}}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="col-md-3 col-3">
+                        <form action="/cms/categories/{{$currentCategory}}/list" method="GET"
+                              class="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100 navbar-search">
                             <div class="input-group">
-                                <input type="text" class="form-control border-0 small"  name="keyword" value="{{ $keyword }}" placeholder="Tìm kiếm...." aria-label="Search" aria-describedby="basic-addon2">
+                                <input type="text" class="form-control border-0 small" name="keyword"
+                                       value="{{ $keyword }}" placeholder="Tìm kiếm...." aria-label="Search"
+                                       aria-describedby="basic-addon2">
                                 <div class="input-group-append">
                                     <button class="btn btn-primary" type="submit">
                                         <i class="fas fa-search fa-sm"></i>
@@ -32,8 +43,8 @@
                             </div>
                         </form>
                     </div>
-                    <div class="col-md-4 col-6 text-right">
-                        <a href="/cms/users/create">
+                    <div class="col-md-3 col-6 text-right">
+                        <a href="/cms/categories/create">
                             <button class="btn btn-success text-uppercase">Thêm mới</button>
                         </a>
                     </div>
@@ -43,15 +54,17 @@
                 @if (session()->has('success'))
                     <div class="alert alert-success"> {{ session('success') }}</div>
                 @endif
+                @error('position')
+                <div class="alert alert-danger"> {{ $message }}</div>
+                @enderror
                 @if(count($list) > 0)
                     <div class="table-responsive">
                         <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
                             <thead>
                             <tr>
                                 <th class="text-center">Id</th>
+                                <th>Position</th>
                                 <th>Name</th>
-                                <th>Device Id</th>
-                                <th>Like Count</th>
                                 <th>Created At</th>
                             </tr>
                             </thead>
@@ -59,10 +72,17 @@
                             @foreach($list as $item)
                                 <tr>
                                     <td class="text-center">{{$item->id}}</td>
+                                    <td style="width: 20%">
+                                        <form
+                                            action="/cms/categories/{{$currentCategory}}/{{  $item->id  }}/updatePosition"
+                                            method="POST">
+                                            @csrf
+                                            <input class="form-control" name="position" type="number"
+                                                   value="{{$item->position}}" {{old('position')}} maxlength="255">
+                                        </form>
+                                    </td>
                                     <td>{{$item->name}}</td>
-                                    <td>{{$item->device_id}}</td>
-                                    <td>{{$item->likes_count}}</td>
-                                    <td>{{date_format($item->created_at, 'Y-m-d')}}</td>
+                                    <td>{{date_format($item->created_at, 'Y-m-d H:i:s')}}</td>
                                 </tr>
                             @endforeach
                             </tbody>
@@ -70,7 +90,8 @@
                     </div>
                     <div class="row">
                         <div class="col-md-6">
-                            <p>Hiển thị từ {{$list->firstItem()}} đến {{$list->lastItem()}} của {{$list->total()}} bản ghi</p>
+                            <p>Hiển thị từ {{$list->firstItem()}} đến {{$list->lastItem()}} của {{$list->total()}} bản
+                                ghi</p>
                         </div>
                         <div class="col-md-6">
                             <div class="float-right">
@@ -79,7 +100,7 @@
                         </div>
                     </div>
                 @else
-                    <h4>Không có user nào.</h4>
+                    <h4>Không có bản ghi nào.</h4>
                 @endif
             </div>
         </div>
@@ -89,8 +110,13 @@
     <script>
         $(document).ready(function () {
             $('#dataTable tbody tr').dblclick(function () {
-                window.location.href = '/cms/users/' + $(this).children().first().text();
+                window.location.href = '/cms/categories/' + $('#categories').val() + '/' + $(this).children().first().text();
             });
+
+        });
+        $('#categories').change(function () {
+            const category = $(this).val();
+            window.location.href = '/cms/categories/' + category + '/list';
         });
     </script>
 @endsection
