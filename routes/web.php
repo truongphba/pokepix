@@ -30,6 +30,17 @@ Route::prefix('categories')->group(function () {
     Route::post('/{name}/{id}/updatePosition', 'CategoryController@updatePosition');
     Route::delete('/{name}/{id}/delete', 'CategoryController@delete');
 });
+
+Route::prefix('pics')->group(function () {
+    Route::get('/', 'PicController@index');
+    Route::post('/', 'PicController@store');
+    Route::get('/create', 'PicController@create');
+    Route::get('/{id}', 'PicController@detail');
+    Route::get('/{id}/edit', 'PicController@edit');
+    Route::post('/{id}/edit', 'PicController@update');
+    Route::post('/{id}/updatePosition', 'PicController@updatePosition');
+    Route::delete('/{id}/delete', 'PicController@delete');
+});
 Route::get('/login', 'AuthController@login');
 Route::post('/login', 'AuthController@loginProcess');
 Route::get('/logout', 'AuthController@logout');

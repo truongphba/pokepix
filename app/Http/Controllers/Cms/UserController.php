@@ -18,6 +18,7 @@ class UserController extends Controller
         $keyword = $request->get('keyword');
         $list = User::orderBy('created_at', 'DESC')->where(function ($query) use ($keyword) {
             $query->where('name', 'like', '%' . $keyword . '%')
+                ->orWhere('id',$keyword )
                 ->orWhere('device_id', 'like', '%' . $keyword . '%');
         })->paginate(20)->appends($request->only('keyword'));
         return view('cms.user.index',['list' => $list, 'keyword' => $keyword]);
