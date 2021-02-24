@@ -1,6 +1,6 @@
 @extends('cms.layouts.layout')
 
-@section('title','User Management')
+@section('title','Quản lý danh mục')
 @section('content')
     <div class="container-fluid">
         <!-- Page Heading -->
@@ -16,19 +16,19 @@
             </div>
             <div class="card-body">
                 <form id="product_form" method="post"
-                      action="/cms/categories/{{ $currentCategory }}/{{  $item->id  }}/edit">
+                      action="/cms/categories/{{  $item->id  }}/edit">
                     @csrf
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label>Danh mục:</label>
-                                <select disabled name="categories" id="categories" class="form-control">
-                                    @foreach($categories as $category)
+                                <select  name="type" id="type" class="form-control">
+                                    @foreach($categoryType as $key => $type)
                                         <option
-                                            value="{{$category}}" {{$currentCategory == $category ? 'selected' : ''}}>{{$category}}</option>
+                                            value="{{$key}}" {{$key == $item->type ? 'selected' : ''}}>{{$type}}</option>
                                     @endforeach
                                 </select>
-                                @error('categories')
+                                @error('type')
                                 <p style="color: red">{{ $message }}</p>
                                 @enderror
                             </div>
@@ -67,7 +67,7 @@
                         </div>
                     </div>
                     <div class="form-group">
-                        <a href="/cms/categories/{{$currentCategory}}/{{$item->id}}">
+                        <a href="/cms/categories/{{$item->id}}">
                             <button type="button" class="btn btn-primary text-uppercase">Quay lại</button>
                         </a>
                         <button class="btn btn-success text-uppercase">Gửi</button>

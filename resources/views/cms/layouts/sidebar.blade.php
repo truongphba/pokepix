@@ -33,14 +33,14 @@
             <span>User</span></a>
     </li>
     <li class="nav-item">
-        <a class="nav-link" href="/cms/categories/category/list">
+        <a class="nav-link" href="/cms/categories?type=1">
             <i class="fas fa-fw fa-table"></i>
             <span>Danh mục</span></a>
     </li>
     <li class="nav-item">
         <a class="nav-link" href="/cms/pics">
             <i class="fas fa-fw fa-table"></i>
-            <span>Tranh</span></a>
+            <span>Hình ảnh</span></a>
     </li>
     <!-- Divider -->
     <hr class="sidebar-divider d-none d-md-block">

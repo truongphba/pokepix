@@ -1,6 +1,6 @@
 @extends('cms.layouts.layout')
 
-@section('title','User Management')
+@section('title','Quản lý danh mục')
 @section('content')
     <div class="container-fluid">
         <!-- Page Heading -->
@@ -22,14 +22,11 @@
                     <div class="col-md-6">
                         <div class="form-group">
                             <label>Danh mục:</label>
-                            <select disabled name="categories" id="categories" class="form-control">
-                                @foreach($categories as $category)
-                                    <option value="{{$category}}" {{$currentCategory == $category ? 'selected' : ''}}>{{$category}}</option>
+                            <select disabled name="type" id="type" class="form-control">
+                                @foreach($categoryType as $key => $type)
+                                    <option value="{{$key}}" {{$item->type == $key ? 'selected' : ''}}>{{$type}}</option>
                                 @endforeach
                             </select>
-                            @error('categories')
-                            <p style="color: red">{{ $message }}</p>
-                            @enderror
                         </div>
                     </div>
                 </div>
@@ -74,10 +71,10 @@
                     </div>
                 </div>
                 <div class="form-group" style="display: flex">
-                    <a href="/cms/categories/{{$currentCategory}}/list">
+                    <a href="/cms/categories?type={{$item->type}}">
                         <button type="button" class="btn btn-primary text-uppercase mr-2">Quay lại</button>
                     </a>
-                    <a href="/cms/categories/{{$currentCategory}}/{{ $item->id }}/edit">
+                    <a href="/cms/categories/{{ $item->id }}/edit">
                         <button type="button" class="btn btn-success text-uppercase mr-2">Sửa</button>
                     </a>
                     <button type="button" class="btn btn-danger text-uppercase mr-2" data-toggle="modal"
@@ -99,7 +96,7 @@
                     </button>
                 </div>
                 <div class="modal-footer">
-                    <form method="post" id="form-delete" action="/cms/categories/{{$currentCategory}}/{{ $item->id }}/delete">
+                    <form method="post" id="form-delete" action="/cms/categories/{{ $item->id }}/delete">
                         @method('DELETE')
                         @csrf
                         <button type="submit" class="btn btn-danger">Có</button>

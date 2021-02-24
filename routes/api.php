@@ -11,6 +11,8 @@
 |
 */
 
+use Illuminate\Support\Facades\Route;
+
 Route::prefix('/')->middleware('device', 'throttle:150,1')->group(function() {
 
     Route::group(['prefix' => '/user'], function () {
@@ -47,7 +49,11 @@ Route::prefix('/')->middleware('device', 'throttle:150,1')->group(function() {
     	Route::get('comment/{id}','V1\ImageController@listComment')->middleware('user');
     	Route::post('comment/{id}','V1\ImageController@comment')->middleware('user');
     	Route::post('/upload', 'V1\ImageController@upload')->middleware('user');
-	});
+
+        Route::get('/category/{id}', 'V1\ImageController@listByCategory')->middleware('user');
+        Route::get('/theme/{id}', 'V1\ImageController@listByTheme')->middleware('user');
+
+    });
 
 });
 

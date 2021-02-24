@@ -14,29 +14,26 @@ class CategoryController extends Controller
         $this->middleware('auth.cms');
     }
 
-    public function index(Request $request, $name)
+    public function index(Request $request)
     {
-        $categories = config('global.categories');
-        if (!in_array($name, $categories)) {
+        $categoryType = config('global.categories_type');
+        $currentType = $request->type;
+        if (!array_key_exists($currentType, $categoryType)) {
             return abort('404');
         }
         $keyword = $request->get('keyword');
-        if ($name == 'category') {
-            $list = Category::query();
-        } else if ($name == 'theme') {
-            $list = Theme::query();
-        }
-        $list = $list->orderByRaw('ISNULL(position), position ASC')->orderBy('created_at', 'DESC')->where(function ($query) use ($keyword) {
+        $list = Category::where('type', $currentType)->orderByRaw('ISNULL(position), position ASC')->orderBy('created_at', 'DESC')->where(function ($query) use ($keyword) {
             $query->where('name', 'like', '%' . $keyword . '%')
                 ->orWhere('id', $keyword);
-        })->paginate(10)->appends($request->only('keyword'))->appends($request->only('category'));
-        return view('cms.category.index', ['list' => $list, 'keyword' => $keyword, 'categories' => $categories, 'currentCategory' => $name]);
+        })->paginate(10)->appends($request->only('keyword'))->appends($request->only('type'));
+
+        return view('cms.category.index', ['list' => $list, 'keyword' => $keyword, 'categoryType' => $categoryType, 'currentType' => $currentType]);
     }
 
     public function create()
     {
-        $categories = config('global.categories');
-        return view('cms.category.create', ['categories' => $categories]);
+        $categoryType = config('global.categories_type');
+        return view('cms.category.create', ['categoryType' => $categoryType]);
     }
 
     public function store(Request $request)
@@ -44,107 +41,68 @@ class CategoryController extends Controller
         $request->validate([
             'name' => 'required',
             'position' => 'numeric|min:1|nullable',
-            'categories' => 'required'
+            'type' => 'required'
         ], [
             'name.required' => 'Name bắt buộc phải nhập.',
             'position.numeric' => 'Position phải là 1 số.',
             'position.min' => 'Position phải lớn hơn 0.',
-            'categories.required' => 'Bắt buộc phải chọn danh mục.',
+            'type.required' => 'Bắt buộc phải chọn danh mục.',
         ]);
-        $categories = $request->categories;
-        if ($categories == 'category') {
-            $item = new Category();
-            $msg = 'Thêm mới category thành công.';
-        } else if ($categories == 'theme') {
-            $item = new Theme();
-            $msg = 'Thêm mới theme thành công.';
-        } else {
-            return redirect('/cms/categories/create');
-        }
+        $item = new Category();
         $item->name = $request->name;
         $item->position = $request->position;
+        $item->type = $request->type;
         $item->save();
 
-        return redirect('/cms/categories/' . $categories . '/' . $item->id)->withSuccess($msg);
+        return redirect('/cms/categories/' . $item->id)->withSuccess('Thêm mới danh mục thành công.');
     }
 
-    public function detail($name, $id)
+    public function detail($id)
     {
-        $categories = config('global.categories');
-        if (!in_array($name, $categories)) {
-            return abort('404');
-        }
-        if ($name == 'category') {
-            $item = Category::find($id);
-        } elseif ($name == 'theme') {
-            $item = Theme::find($id);
-        } else {
-            return redirect()->back();
-        }
+        $categoryType = config('global.categories_type');
+        $item = Category::find($id);
 
-        return view('cms.category.detail', ['item' => $item, 'categories' => $categories, 'currentCategory' => $name]);
+        return view('cms.category.detail', ['item' => $item, 'categoryType' => $categoryType]);
     }
 
-    public function edit($name, $id)
+    public function edit($id)
     {
-        $categories = config('global.categories');
-        if (!in_array($name, $categories)) {
-            return abort('404');
-        }
-        if ($name == 'category') {
-            $item = Category::find($id);
-        } elseif ($name == 'theme') {
-            $item = Theme::find($id);
-        } else {
-            return redirect()->back();
-        }
-        return view('cms.category.edit', ['item' => $item, 'categories' => $categories, 'currentCategory' => $name]);
+        $categoryType = config('global.categories_type');
+        $item = Category::find($id);
+        return view('cms.category.edit', ['item' => $item, 'categoryType' => $categoryType]);
     }
 
-    public function update(Request $request, $name, $id)
+    public function update(Request $request, $id)
     {
         $request->validate([
             'name' => 'required',
-            'position' => 'numeric|min:1|nullable'
+            'position' => 'numeric|min:1|nullable',
+            'type' => 'required'
         ], [
             'name.required' => 'Name bắt buộc phải nhập.',
             'position.numeric' => 'Position phải là 1 số.',
             'position.min' => 'Position phải lớn hơn 0.',
+            'type.required' => 'Bắt buộc phải chọn danh mục.',
         ]);
-        $categories = $name;
-        if ($categories == 'category') {
-            $item = Category::find($id);
-            $msg = 'Cập nhật category thành công.';
-        } else if ($categories == 'theme') {
-            $item = Theme::find($id);
-            $msg = 'Cập nhật theme thành công.';
-        } else {
-            return redirect()->back();
-        }
+
+        $item = Category::find($id);
         $item->name = $request->name;
         $item->position = $request->position;
+        $item->type = $request->type;
         $item->save();
 
-        return redirect('/cms/categories/' . $categories . '/' . $item->id)->withSuccess($msg);
+        return redirect('/cms/categories/' . $item->id)->withSuccess('Cập nhật danh mục thành công.');
     }
 
-    public function delete($name, $id)
+    public function delete($id)
     {
-        if ($name == 'category') {
-            $item = Category::find($id);
-            $msg = 'Xoá category thành công.';
-        } else if ($name == 'theme') {
-            $item = Theme::find($id);
-            $msg = 'Xoá theme thành công.';
-        } else {
-            return redirect()->back();
-        }
+        $item = Category::find($id);
         $item->delete();
 
-        return redirect('/cms/categories/' . $name . '/list')->withSuccess($msg);
+        return redirect('/cms/categories?type=' . $item->type)->withSuccess('Xoá danh mục thành công.');
     }
 
-    public function updatePosition(Request $request, $name, $id)
+    public function updatePosition(Request $request, $id)
     {
         $request->validate([
             'position' => 'numeric|min:1|nullable'
@@ -152,17 +110,10 @@ class CategoryController extends Controller
             'position.numeric' => 'Position phải là 1 số.',
             'position.min' => 'Position phải lớn hơn 0.',
         ]);
-        if ($name == 'category') {
-            $item = Category::find($id);
-            $msg = 'Cập nhật vị trí category thành công.';
-        } else if ($name == 'theme') {
-            $item = Theme::find($id);
-            $msg = 'Cập nhật vị trí theme thành công.';
-        } else {
-            return redirect()->back();
-        }
+
+        $item = Category::find($id);
         $item->position = $request->position;
         $item->save();
-        return redirect('/cms/categories/' . $name . '/list')->withSuccess($msg);
+        return redirect('/cms/categories?type=' . $item->type)->withSuccess('Cập nhật vị trí danh mục thành công.');
     }
 }

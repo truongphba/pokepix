@@ -21,14 +21,14 @@ Route::prefix('users')->group(function () {
     Route::delete('/{id}/delete', 'UserController@delete');
 });
 Route::prefix('categories')->group(function () {
-    Route::get('/{name}/list', 'CategoryController@index');
+    Route::get('/', 'CategoryController@index');
     Route::post('/', 'CategoryController@store');
     Route::get('/create', 'CategoryController@create');
-    Route::get('/{name}/{id}', 'CategoryController@detail');
-    Route::get('/{name}/{id}/edit', 'CategoryController@edit');
-    Route::post('/{name}/{id}/edit', 'CategoryController@update');
-    Route::post('/{name}/{id}/updatePosition', 'CategoryController@updatePosition');
-    Route::delete('/{name}/{id}/delete', 'CategoryController@delete');
+    Route::get('/{id}', 'CategoryController@detail');
+    Route::get('/{id}/edit', 'CategoryController@edit');
+    Route::post('/{id}/edit', 'CategoryController@update');
+    Route::post('/{id}/updatePosition', 'CategoryController@updatePosition');
+    Route::delete('/{id}/delete', 'CategoryController@delete');
 });
 
 Route::prefix('pics')->group(function () {

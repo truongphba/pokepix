@@ -41,6 +41,32 @@
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-group">
+                                <label>Category:</label>
+                                <select name="category_id" id="category_id" class="form-control">
+                                    <option value="">-- Chọn category --</option>
+                                    @foreach($categories as $category)
+                                        <option value="{{$category->id}}" {{ $item->category_id == $category->id ? 'selected' : '' }}>{{$category->name}}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Theme:</label>
+                                <select name="theme_id" id="theme_id" class="form-control">
+                                    <option value="">-- Chọn theme --</option>
+                                    @foreach($themes as $theme)
+                                        <option value="{{$theme->id}}" {{ $item->theme_id == $theme->id ? 'selected' : '' }}>{{$theme->name}}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
                                 <label>Position:</label>
                                 <input class="form-control" name="position" value="{{ $item->position }}"
                                        {{old('position')}} maxlength="255">

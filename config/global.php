@@ -1,4 +1,7 @@
 <?php
 return [
-    'categories' => ['category','theme']
+    'categories_type' => [
+        1 => 'category',
+        2 =>'theme'
+    ]
 ];

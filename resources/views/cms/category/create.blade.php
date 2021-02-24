@@ -1,6 +1,6 @@
 @extends('cms.layouts.layout')
 
-@section('title','User Management')
+@section('title','Quản lý danh mục')
 @section('content')
     <div class="container-fluid">
         <!-- Page Heading -->
@@ -21,13 +21,13 @@
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label>Danh mục:</label>
-                                <select name="categories" id="categories" class="form-control">
+                                <select name="type" id="type" class="form-control">
                                     <option value="">-- Chọn danh mục --</option>
-                                @foreach($categories as $category)
-                                    <option value="{{$category}}">{{$category}}</option>
+                                @foreach($categoryType as $key => $type)
+                                    <option value="{{$key}}">{{$type}}</option>
                                 @endforeach
                                 </select>
-                                @error('categories')
+                                @error('type')
                                 <p style="color: red">{{ $message }}</p>
                                 @enderror
                             </div>
@@ -56,7 +56,7 @@
                         </div>
                     </div>
                     <div class="form-group">
-                        <a href="/cms/categories/category/list">
+                        <a href="/cms/categories?type=1">
                             <button type="button" class="btn btn-primary text-uppercase">Quay lại</button>
                         </a>
                         <button class="btn btn-success text-uppercase">Gửi</button>

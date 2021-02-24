@@ -12,4 +12,8 @@ class Pic extends Model
     {
         return url($this->file);
     }
+
+    public function categories(){
+        return $this->belongsToMany('App\Models\Category', 'category_pic', 'pic_id', 'category_id')->withPivot('type');
+    }
 }

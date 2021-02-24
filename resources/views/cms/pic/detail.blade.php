@@ -37,9 +37,30 @@
                 <div class="row">
                     <div class="col-md-6">
                         <div class="form-group">
+                            <label>Category:</label>
+                            <select disabled name="category_id" id="category_id" class="form-control">
+                                <option value="">{{ $item->category }}</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label>Theme:</label>
+                            <select disabled name="theme_id" id="theme_id" class="form-control">
+                                <option value="">{{ $item->theme }}</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
                             <label>File:</label>
                             @if(isset($item->file))
-                                <div><img style="width: 400px" src="{{  $item->getFileUrl() }}" alt="{{  $item->getFileUrl() }}">
+                                <div><img style="width: 400px" src="{{  $item->getFileUrl() }}"
+                                          alt="{{  $item->getFileUrl() }}">
                                 </div>
                             @else
                                 <p style="font-style: italic">None</p>

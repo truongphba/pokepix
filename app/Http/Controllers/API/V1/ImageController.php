@@ -96,7 +96,7 @@ class ImageController extends Controller
             \DB::rollBack();
             return response()->json(['data' => null, 'alert' => 'Comment not created!'], 200);
         }
-        
+
 
     }
 
@@ -153,4 +153,7 @@ class ImageController extends Controller
         return response()->json(['file' => $destinationPath.'/'.$name, 'path' => url($destinationPath.'/'.$name)], 200);
     }
 
+    public function listByCategory(){
+        return response()->json(1, 200);
+    }
 }
