@@ -13,7 +13,8 @@ class Kernel extends ConsoleKernel
      * @var array
      */
     protected $commands = [
-        //
+        Commands\DailyCheckServer::class,
+        Commands\WarningCheckServer::class,
     ];
 
     /**
@@ -26,6 +27,10 @@ class Kernel extends ConsoleKernel
     {
         // $schedule->command('inspire')
         //          ->hourly();
+        $schedule->command('daily:check')
+            ->dailyAt('8:00');
+        $schedule->command('warning:check')
+            ->everyFiveMinutes();
     }
 
     /**
