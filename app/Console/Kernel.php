@@ -28,9 +28,10 @@ class Kernel extends ConsoleKernel
         // $schedule->command('inspire')
         //          ->hourly();
         $schedule->command('daily:check')
-            ->dailyAt('8:00');
+            ->timezone('Asia/Ho_Chi_Minh')
+            ->dailyAt('15:06');
         $schedule->command('warning:check')
-            ->everyFiveMinutes();
+            ->everyMinute();
     }
 
     /**
