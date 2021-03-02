@@ -29,17 +29,17 @@
     <!-- Nav Item - Tables -->
     <li class="nav-item">
         <a class="nav-link" href="/cms/users">
-            <i class="fas fa-fw fa-table"></i>
+            <i class="fas fa-fw fa-user"></i>
             <span>User</span></a>
     </li>
     <li class="nav-item">
-        <a class="nav-link" href="/cms/categories?type=1">
+        <a class="nav-link" href="/cms/categories">
             <i class="fas fa-fw fa-table"></i>
             <span>Danh mục</span></a>
     </li>
     <li class="nav-item">
         <a class="nav-link" href="/cms/pics">
-            <i class="fas fa-fw fa-table"></i>
+            <i class="fas fa-fw fa-image"></i>
             <span>Hình ảnh</span></a>
     </li>
     <!-- Divider -->

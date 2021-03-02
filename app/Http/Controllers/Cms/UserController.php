@@ -53,6 +53,13 @@ class UserController extends Controller
 
             $request->file('avatar')->move($path, $name);
             $user->avatar = $destinationPath.'/'.$name;
+
+            Image::configure(array('driver' => 'imagick'));
+            // open an image file
+            $img = Image::make($path.'/'.$name);
+            // resize image instance
+            $img->resize(400, 400);
+            $img->save($path.'/'.$name);
         }
 
 
@@ -102,6 +109,13 @@ class UserController extends Controller
 
             $request->file('avatar')->move($path, $name);
             $user->avatar = $destinationPath.'/'.$name;
+
+            Image::configure(array('driver' => 'imagick'));
+            // open an image file
+            $img = Image::make($path.'/'.$name);
+            // resize image instance
+            $img->resize(400, 400);
+            $img->save($path.'/'.$name);
         }
 
         $user->name = $request->name;
@@ -116,5 +130,12 @@ class UserController extends Controller
         $user->delete();
 
         return redirect('/cms/users/')->withSuccess('Xoá user thành công.');
+    }
+
+    public function deleteSelected(Request $request){
+        $ids = $request->get('ids');
+        $user = User::whereIn('id', $ids);
+        $user->delete();
+        return $ids;
     }
 }

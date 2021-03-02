@@ -17,12 +17,16 @@ class CategoryController extends Controller
     public function index(Request $request)
     {
         $categoryType = config('global.categories_type');
-        $currentType = $request->type;
-        if (!array_key_exists($currentType, $categoryType)) {
-            return abort('404');
-        }
+
+
         $keyword = $request->get('keyword');
-        $list = Category::where('type', $currentType)->orderByRaw('ISNULL(position), position ASC')->orderBy('created_at', 'DESC')->where(function ($query) use ($keyword) {
+        $list = Category::query();
+        $currentType = null;
+        if ($request->type){
+            $currentType = $request->type;
+            $list = $list->where('type', $request->type);
+        }
+        $list = $list->orderByRaw('ISNULL(position), position ASC')->orderBy('created_at', 'DESC')->where(function ($query) use ($keyword) {
             $query->where('name', 'like', '%' . $keyword . '%')
                 ->orWhere('id', $keyword);
         })->paginate(10)->appends($request->only('keyword'))->appends($request->only('type'));

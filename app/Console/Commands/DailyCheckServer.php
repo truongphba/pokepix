@@ -38,7 +38,7 @@ class DailyCheckServer extends Command
     public function handle()
     {
         $serverInfo = $this->checkServer();
-        $message = "ram: ".$serverInfo['usedmemInGB']."/".$serverInfo['totalram']."(".$serverInfo['memory'].")- CPU: ".$serverInfo['cpu']." - DISK: ".round($serverInfo['disktotalsize'],2)." GB (".$serverInfo['diskuse'].")";
+        $message = "RAM: ".$serverInfo['usedmemInGB']."/".$serverInfo['totalram']."(".$serverInfo['memory'].")\nCPU: ".$serverInfo['cpu']."%\nDISK: ".round($serverInfo['disktotalsize'],2)." GB (".$serverInfo['diskuse'].")";
 
         $webhookurl = "https://discord.com/api/webhooks/814325321100427314/tnUdAmVixO8lGv2LCB_tF2H5EM8kvlDGsCjplP9FHMYk2ChrlrI-JNus_gr5MedzrM_t";
         $json_data = json_encode([

@@ -59,7 +59,7 @@
                         <div class="form-group">
                             <label>File:</label>
                             @if(isset($item->file))
-                                <div><img style="width: 400px" src="{{  $item->getFileUrl() }}"
+                                <div><img style="max-width: 600px;" src="{{  $item->getFileUrl() }}"
                                           alt="{{  $item->getFileUrl() }}">
                                 </div>
                             @else

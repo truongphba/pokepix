@@ -39,7 +39,7 @@
                         <div class="form-group">
                             <label>Avatar:</label>
                             @if(isset($item->avatar))
-                                <div><img style="width: 400px" src="{{  $item->avatar }}" alt="{{  $item->avatar }}"></div>
+                                <div><img style="max-width: 400px" src="{{  $item->avatar }}" alt="{{  $item->avatar }}"></div>
                             @else
                                 <p style="font-style: italic">None</p>
                             @endif

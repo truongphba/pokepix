@@ -8,6 +8,7 @@ use App\Models\Theme;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\DB;
+use Intervention\Image\ImageManagerStatic;
 
 class PicController extends Controller
 {
@@ -116,6 +117,16 @@ class PicController extends Controller
 
                 $request->file('file')->move($path, $name);
                 $item->file = $destinationPath . '/' . $name;
+
+                if ($file->getClientOriginalExtension() != 'gif') {
+                    // copy($file->getRealPath(), $destination);
+                    ImageManagerStatic::configure(array('driver' => 'imagick'));
+                    // open an image file
+                    $img = ImageManagerStatic::make($path . '/' . $name);
+                    // resize image instance
+                    $img->resize(600, 600);
+                    $img->save($path . '/' . $name);
+                }
             }
 
             $item->name = $request->name;
@@ -220,6 +231,16 @@ class PicController extends Controller
 
                 $request->file('file')->move($path, $name);
                 $item->file = $destinationPath . '/' . $name;
+
+                if ($file->getClientOriginalExtension() != 'gif') {
+                    // copy($file->getRealPath(), $destination);
+                    ImageManagerStatic::configure(array('driver' => 'imagick'));
+                    // open an image file
+                    $img = ImageManagerStatic::make($path . '/' . $name);
+                    // resize image instance
+                    $img->resize(600, 600);
+                    $img->save($path . '/' . $name);
+                }
             }
 
             $item->name = $request->name;
@@ -281,5 +302,20 @@ class PicController extends Controller
         $item->position = $request->position;
         $item->save();
         return redirect('/cms/pics')->withSuccess($msg);
+    }
+
+    public function deleteSelected(Request $request){
+        $ids = $request->get('ids');
+        DB::beginTransaction();
+        try {
+            $item = Pic::whereIn('id', $ids);
+            $item->delete();
+            DB::table('category_pic')->whereIn('pic_id' , $ids)->delete();
+            DB::commit();
+            return $ids;
+        } catch (Exception $e) {
+            DB::rollBack();
+            return false;
+        }
     }
 }

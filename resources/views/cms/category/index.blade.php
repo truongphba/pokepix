@@ -22,6 +22,7 @@
                     </div>
                     <div class="col-md-3 col-3">
                         <select name="type" id="type" class="form-control">
+                            <option value="" {{$currentType == null ? 'selected' : ''}}>Tất cả</option>
                             @foreach($categoryType as $key => $type)
                                 <option
                                     value="{{$key}}" {{$currentType == $key ? 'selected' : ''}}>{{$type}}</option>

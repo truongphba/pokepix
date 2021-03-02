@@ -71,7 +71,7 @@
                     </div>
                 </div>
                 <div class="form-group" style="display: flex">
-                    <a href="/cms/categories?type={{$item->type}}">
+                    <a href="/cms/categories">
                         <button type="button" class="btn btn-primary text-uppercase mr-2">Quay lại</button>
                     </a>
                     <a href="/cms/categories/{{ $item->id }}/edit">

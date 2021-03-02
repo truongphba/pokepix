@@ -19,6 +19,8 @@ Route::prefix('users')->group(function () {
     Route::get('/{id}/edit', 'UserController@edit');
     Route::post('/{id}/edit', 'UserController@update');
     Route::delete('/{id}/delete', 'UserController@delete');
+    Route::post('/delete-selected', 'UserController@deleteSelected');
+
 });
 Route::prefix('categories')->group(function () {
     Route::get('/', 'CategoryController@index');
@@ -40,7 +42,11 @@ Route::prefix('pics')->group(function () {
     Route::post('/{id}/edit', 'PicController@update');
     Route::post('/{id}/updatePosition', 'PicController@updatePosition');
     Route::delete('/{id}/delete', 'PicController@delete');
+    Route::post('/delete-selected', 'PicController@deleteSelected');
 });
 Route::get('/login', 'AuthController@login');
 Route::post('/login', 'AuthController@loginProcess');
 Route::get('/logout', 'AuthController@logout');
+Route::get('/index', function(){
+    return redirect('/cms/users');
+});

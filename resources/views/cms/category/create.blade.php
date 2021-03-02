@@ -56,10 +56,10 @@
                         </div>
                     </div>
                     <div class="form-group">
-                        <a href="/cms/categories?type=1">
+                        <a href="/cms/categories">
                             <button type="button" class="btn btn-primary text-uppercase">Quay lại</button>
                         </a>
-                        <button class="btn btn-success text-uppercase">Gửi</button>
+                        <button class="btn btn-success text-uppercase">Lưu</button>
                     </div>
                 </form>
             </div>

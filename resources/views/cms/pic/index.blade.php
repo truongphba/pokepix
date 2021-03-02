@@ -25,7 +25,8 @@
                             class="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100 navbar-search">
                             <div class="input-group">
                                 <input type="text" class="form-control border-0 small" name="keyword"
-                                       id="keyword" value="{{ $keyword }}" placeholder="Tìm kiếm...." aria-label="Search"
+                                       id="keyword" value="{{ $keyword }}" placeholder="Tìm kiếm...."
+                                       aria-label="Search"
                                        aria-describedby="basic-addon2">
                                 <input type="hidden" name="category_id" value="{{$currentCategoryId}}">
                                 <input type="hidden" name="theme_id" value="{{$currentThemeId}}">
@@ -37,10 +38,11 @@
                             </div>
                         </form>
                     </div>
-                    <div class="col-md-3 col-6 text-right">
+                    <div class="col-md-4 col-6 text-right">
                         <a href="/cms/pics/create">
                             <button class="btn btn-success text-uppercase">Thêm mới</button>
                         </a>
+                        <button class="btn btn-danger" id="delete-selected">Xoá mục đã chọn</button>
                     </div>
                 </div>
                 <hr class="mt-2 mb-2">
@@ -50,7 +52,8 @@
                         <select name="category" id="categoryFilter" class="form-control">
                             <option value="">Tất cả</option>
                             @foreach($categories as $key => $category)
-                                <option value="{{$category->id}}" {{ $currentCategoryId == $category->id ? 'selected' : ''}}>{{$category->name}}</option>
+                                <option
+                                    value="{{$category->id}}" {{ $currentCategoryId == $category->id ? 'selected' : ''}}>{{$category->name}}</option>
                             @endforeach
                         </select>
                     </div>
@@ -59,7 +62,8 @@
                         <select name="theme" id="themeFilter" class="form-control">
                             <option value="">Tất cả</option>
                             @foreach($themes as $key => $theme)
-                                <option value="{{$theme->id}}" {{ $currentThemeId == $theme->id ? 'selected' : ''}}>{{$theme->name}}</option>
+                                <option
+                                    value="{{$theme->id}}" {{ $currentThemeId == $theme->id ? 'selected' : ''}}>{{$theme->name}}</option>
                             @endforeach
                         </select>
                     </div>
@@ -80,6 +84,9 @@
                         <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
                             <thead>
                             <tr>
+                                <th class="text-center">
+                                    <input type="checkbox" class="form-check" id="check-all">
+                                </th>
                                 <th class="text-center">Id</th>
                                 <th>Position</th>
                                 <th>Name</th>
@@ -92,6 +99,8 @@
                             <tbody>
                             @foreach($list as $item)
                                 <tr>
+                                    <td class="text-center"><input type="checkbox" class="form-check product-checkbox"
+                                                                   value="{{$item->id}}" name="selected[]"></td>
                                     <td class="text-center">{{$item->id}}</td>
                                     <td style="width: 20%">
                                         <form
@@ -106,7 +115,7 @@
                                     <td>{{ $item->category }}</td>
                                     <td>{{ $item->theme}}</td>
                                     <td class="text-center">
-                                        <img src="{{$item->getFileUrl()}}" style="width: 150px; height:100px;">
+                                        <img src="{{$item->getFileUrl()}}" style="width: auto; height:70px;">
                                     </td>
                                     <td>{{date_format($item->created_at, 'Y-m-d H:i:s')}}</td>
                                 </tr>
@@ -126,7 +135,7 @@
                         </div>
                     </div>
                 @else
-                    <h4>Không có tranh nào.</h4>
+                    <h4>Không có hình ảnh nào nào.</h4>
                 @endif
             </div>
         </div>
@@ -136,13 +145,42 @@
     <script>
         $(document).ready(function () {
             $('#dataTable tbody tr').dblclick(function () {
-                window.location.href = '/cms/pics/' + $(this).children().first().text();
+                window.location.href = '/cms/pics/' + $(this).children().first().next().text();
             });
-            $('#filter').click(function (){
-               let category_id =  $('#categoryFilter').val();
-               let theme_id =  $('#themeFilter').val();
-               let keyword =  $('#keyword').val();
-               window.location.href = '/cms/pics?category_id=' + category_id + '&theme_id=' + theme_id + '&keyword=' + keyword;
+            $('#filter').click(function () {
+                let category_id = $('#categoryFilter').val();
+                let theme_id = $('#themeFilter').val();
+                let keyword = $('#keyword').val();
+                window.location.href = '/cms/pics?category_id=' + category_id + '&theme_id=' + theme_id + '&keyword=' + keyword;
+            })
+            $('#check-all').click(function () {
+                $('.product-checkbox').prop('checked', $(this).prop('checked'));
+            });
+
+            $('#delete-selected').click(function () {
+                var ids = $('.product-checkbox:checked').map(function () {
+                    return $(this).val();
+                }).get();
+                if (ids.length == 0) {
+                    alert('Vui lòng chọn ít nhất 1 hình ảnh.');
+                    return;
+                }
+                if (confirm('Bạn có chắc chắn muốn xoá không ?')) {
+                    $.ajax({
+                        'url': '/cms/pics/delete-selected',
+                        'method': 'POST',
+                        'data': {
+                            "_token": $('meta[name="csrf-token"]').attr('content'),
+                            'ids': ids,
+                        },
+                        'success': function () {
+                            location.reload();
+                        },
+                        'error': function () {
+                            alert('Đã có lỗi xảy ra');
+                        }
+                    })
+                }
             })
         });
     </script>

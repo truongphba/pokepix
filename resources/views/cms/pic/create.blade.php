@@ -67,18 +67,18 @@
                         </div>
                     </div>
                     <div class="form-group">
-                        <label for="avatar">File</label>
+                        <label for="file">File</label>
                         <input type="file" name="file" class="form-control-file" id="file">
                         @error('file')
                         <p style="color: red">{{ $message }}</p>
                         @enderror
-                        <img style="width: 300px; margin: 20px 0;" id="blah" src=""/>
+                        <img style="max-width: 600px; margin: 20px 0;" id="blah" src=""/>
                     </div>
                     <div class="form-group">
                         <a href="/cms/pics">
                             <button type="button" class="btn btn-primary text-uppercase">Quay Lại</button>
                         </a>
-                        <button class="btn btn-success text-uppercase">Gửi</button>
+                        <button class="btn btn-success text-uppercase">Lưu</button>
                     </div>
                 </form>
             </div>

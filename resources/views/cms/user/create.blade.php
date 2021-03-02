@@ -45,13 +45,13 @@
                         @error('avatar')
                         <p style="color: red">{{ $message }}</p>
                         @enderror
-                        <img style="width: 300px; margin: 20px 0;" id="blah" src="" />
+                        <img style="max-width: 400px; margin: 20px 0;" id="blah" src="" />
                     </div>
                     <div class="form-group">
                         <a href="/cms/users">
                             <button type="button" class="btn btn-primary text-uppercase">Quay Lại</button>
                         </a>
-                        <button class="btn btn-success text-uppercase">Gửi</button>
+                        <button class="btn btn-success text-uppercase">Lưu</button>
                     </div>
                 </form>
             </div>

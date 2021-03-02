@@ -36,6 +36,7 @@
                         <a href="/cms/users/create">
                             <button class="btn btn-success text-uppercase">Thêm mới</button>
                         </a>
+                        <button class="btn btn-danger" id="delete-selected">Xoá mục đã chọn</button>
                     </div>
                 </div>
             </div>
@@ -48,6 +49,9 @@
                         <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
                             <thead>
                             <tr>
+                                <th class="text-center">
+                                    <input type="checkbox" class="form-check" id="check-all">
+                                </th>
                                 <th class="text-center">Id</th>
                                 <th>Name</th>
                                 <th>Device Id</th>
@@ -58,6 +62,8 @@
                             <tbody>
                             @foreach($list as $item)
                                 <tr>
+                                    <td class="text-center"><input type="checkbox" class="form-check product-checkbox"
+                                                                   value="{{$item->id}}" name="selected[]"></td>
                                     <td class="text-center">{{$item->id}}</td>
                                     <td>{{$item->name}}</td>
                                     <td>{{$item->device_id}}</td>
@@ -89,8 +95,36 @@
     <script>
         $(document).ready(function () {
             $('#dataTable tbody tr').dblclick(function () {
-                window.location.href = '/cms/users/' + $(this).children().first().text();
+                window.location.href = '/cms/users/' + $(this).children().first().next().text();
             });
+            $('#check-all').click(function () {
+                $('.product-checkbox').prop('checked', $(this).prop('checked'));
+            });
+            $('#delete-selected').click(function () {
+                var ids = $('.product-checkbox:checked').map(function(){
+                    return $(this).val();
+                }).get();
+                if(ids.length == 0){
+                    alert('Vui lòng chọn ít nhất 1 hình ảnh.');
+                    return;
+                }
+                if(confirm('Bạn có chắc chắn muốn xoá không ?')){
+                    $.ajax({
+                        'url': '/cms/users/delete-selected',
+                        'method': 'POST',
+                        'data': {
+                            "_token": $('meta[name="csrf-token"]').attr('content'),
+                            'ids': ids,
+                        },
+                        'success': function () {
+                            location.reload();
+                        },
+                        'error': function () {
+                            alert('Đã có lỗi xảy ra');
+                        }
+                    })
+                }
+            })
         });
     </script>
 @endsection

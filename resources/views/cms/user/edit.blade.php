@@ -56,13 +56,13 @@
                         @error('avatar')
                         <p style=" color: red">{{ $message }}</p>
                         @enderror
-                        <img style="width: 400px; margin: 20px 0;" id="blah" src="{{ $item->avatar }}"/>
+                        <img style="max-width: 400px; margin: 20px 0;" id="blah" src="{{ $item->avatar }}"/>
                     </div>
                     <div class="form-group">
                         <a href="/cms/users/{{$item->id}}">
                             <button type="button" class="btn btn-primary text-uppercase">Quay Lại</button>
                         </a>
-                        <button class="btn btn-success text-uppercase">Gửi</button>
+                        <button class="btn btn-success text-uppercase">Lưu</button>
                     </div>
                 </form>
             </div>
