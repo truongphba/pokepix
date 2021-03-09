@@ -17,9 +17,12 @@ class DeviceUser
      */
     public function handle($request, Closure $next, $guard = null)
     {
+        $token = $request->token;
         $device = $request->header('Device');
-        $user = User::whereDeviceId($device)->first();
-
+        $user = User::where('token', $token)->first();
+        if(!$user){
+            $user = User::whereDeviceId($device)->first();
+        }
         if( !$user )
         {
             return response()->json(['message' => 'User not found!'], 200);

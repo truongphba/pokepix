@@ -8,4 +8,19 @@ class Category extends Model
 {
     protected $table = 'categories';
 
+    public function getAvatarUrl()
+    {
+        if ($this->avatar) {
+            return url($this->avatar);
+        }
+        return '';
+    }
+
+    public function getCoverUrl()
+    {
+        if ($this->cover) {
+            return url($this->cover);
+        }
+        return '';
+    }
 }

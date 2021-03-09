@@ -19,7 +19,11 @@ class UserController extends Controller
     public function create(CreateUserRequest $request)
     {
         $device = $request->header('Device');
-        $exits  = User::whereDeviceId($device)->first();
+        $token = $request->token;
+        $exits  = User::where('token', $token)->first();
+        if (!$exits){
+            $exits  = User::whereDeviceId($device)->first();
+        }
 
         if( $exits )
         {
@@ -106,7 +110,7 @@ class UserController extends Controller
 
     public function topUser()
     {
-        $users = User::withCount('likes','images','followers','followings')->orderBy('likes_count','DESC')->paginate(100);
+        $users = User::withCount('likes','images','followers','followings')->orderBy('likes_count','DESC')->first();
 
         return response()->json(['data' => $users], 200);
     }

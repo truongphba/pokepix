@@ -6,6 +6,7 @@ use App\Models\Category;
 use App\Models\Theme;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use Intervention\Image\ImageManagerStatic;
 
 class CategoryController extends Controller
 {
@@ -45,17 +46,75 @@ class CategoryController extends Controller
         $request->validate([
             'name' => 'required',
             'position' => 'numeric|min:1|nullable',
-            'type' => 'required'
+            'type' => 'required',
+            'avatar' => 'file|mimes:jpeg,png,jpg|max:1024',
+            'cover' => 'file|mimes:jpeg,png,jpg|max:1024'
         ], [
             'name.required' => 'Name bắt buộc phải nhập.',
             'position.numeric' => 'Position phải là 1 số.',
             'position.min' => 'Position phải lớn hơn 0.',
             'type.required' => 'Bắt buộc phải chọn danh mục.',
+            'avatar.file' => 'avatar phải có định dạng jpeg, png, jpg',
+            'avatar.mimes' => 'avatar phải có định dạng jpeg, png, jpg',
+            'avatar.max' => 'avatar có kích thước tối đa là 1024kb',
+            'cover.file' => 'cover phải có định dạng jpeg, png, jpg',
+            'cover.mimes' => 'cover phải có định dạng jpeg, png, jpg',
+            'cover.max' => 'cover có kích thước tối đa là 1024kb'
         ]);
         $item = new Category();
         $item->name = $request->name;
         $item->position = $request->position;
         $item->type = $request->type;
+        if ($request->type == 2){
+            if ($request->file('avatar')) {
+                $fileAvatar = $request->file('avatar');
+                $extendsAvatar = $fileAvatar->getClientOriginalExtension();
+
+                //Move Uploaded File
+                $destinationPathAvatar = 'themes/avatar/' . date('Y/m/d');
+                $nameAvatar = \Str::slug($request->name) . '.' . $extendsAvatar;
+
+                $pathAvatar = public_path($destinationPathAvatar);
+                \File::isDirectory($pathAvatar) or \File::makeDirectory($pathAvatar, 0777, true, true);
+
+                $request->file('avatar')->move($pathAvatar, $nameAvatar);
+                $item->avatar = $destinationPathAvatar . '/' . $nameAvatar;
+
+                if ($fileAvatar->getClientOriginalExtension() != 'gif') {
+                    // copy($file->getRealPath(), $destination);
+                    ImageManagerStatic::configure(array('driver' => 'imagick'));
+                    // open an image file
+                    $imgAvatar = ImageManagerStatic::make($pathAvatar . '/' . $nameAvatar);
+                    // resize image instance
+                    $imgAvatar->resize(600, 600);
+                    $imgAvatar->save($pathAvatar . '/' . $nameAvatar);
+                }
+            }
+            if ($request->file('cover')) {
+                $file = $request->file('cover');
+                $extends = $file->getClientOriginalExtension();
+
+                //Move Uploaded File
+                $destinationPath = 'themes/cover/' . date('Y/m/d');
+                $name = \Str::slug($request->name) . '.' . $extends;
+
+                $path = public_path($destinationPath);
+                \File::isDirectory($path) or \File::makeDirectory($path, 0777, true, true);
+
+                $request->file('cover')->move($path, $name);
+                $item->cover = $destinationPath . '/' . $name;
+
+//                if ($file->getClientOriginalExtension() != 'gif') {
+//                    // copy($file->getRealPath(), $destination);
+//                    ImageManagerStatic::configure(array('driver' => 'imagick'));
+//                    // open an image file
+//                    $img = ImageManagerStatic::make($path . '/' . $name);
+//                    // resize image instance
+//                    $img->resize(600, 600);
+//                    $img->save($path . '/' . $name);
+//                }
+            }
+        }
         $item->save();
 
         return redirect('/cms/categories/' . $item->id)->withSuccess('Thêm mới danh mục thành công.');
@@ -81,18 +140,76 @@ class CategoryController extends Controller
         $request->validate([
             'name' => 'required',
             'position' => 'numeric|min:1|nullable',
-            'type' => 'required'
+            'type' => 'required',
+            'avatar' => 'file|mimes:jpeg,png,jpg|max:1024',
+            'cover' => 'file|mimes:jpeg,png,jpg|max:1024'
         ], [
             'name.required' => 'Name bắt buộc phải nhập.',
             'position.numeric' => 'Position phải là 1 số.',
             'position.min' => 'Position phải lớn hơn 0.',
             'type.required' => 'Bắt buộc phải chọn danh mục.',
+            'avatar.file' => 'avatar phải có định dạng jpeg, png, jpg',
+            'avatar.mimes' => 'avatar phải có định dạng jpeg, png, jpg',
+            'avatar.max' => 'avatar có kích thước tối đa là 1024kb',
+            'cover.file' => 'cover phải có định dạng jpeg, png, jpg',
+            'cover.mimes' => 'cover phải có định dạng jpeg, png, jpg',
+            'cover.max' => 'cover có kích thước tối đa là 1024kb'
         ]);
 
         $item = Category::find($id);
         $item->name = $request->name;
         $item->position = $request->position;
         $item->type = $request->type;
+        if ($request->type == 2){
+            if ($request->file('avatar')) {
+                $fileAvatar = $request->file('avatar');
+                $extendsAvatar = $fileAvatar->getClientOriginalExtension();
+
+                //Move Uploaded File
+                $destinationPathAvatar = 'themes/avatar/' . date('Y/m/d');
+                $nameAvatar = \Str::slug($request->name) . '.' . $extendsAvatar;
+
+                $pathAvatar = public_path($destinationPathAvatar);
+                \File::isDirectory($pathAvatar) or \File::makeDirectory($pathAvatar, 0777, true, true);
+
+                $request->file('avatar')->move($pathAvatar, $nameAvatar);
+                $item->avatar = $destinationPathAvatar . '/' . $nameAvatar;
+
+                if ($fileAvatar->getClientOriginalExtension() != 'gif') {
+                    // copy($file->getRealPath(), $destination);
+                    ImageManagerStatic::configure(array('driver' => 'imagick'));
+                    // open an image file
+                    $imgAvatar = ImageManagerStatic::make($pathAvatar . '/' . $nameAvatar);
+                    // resize image instance
+                    $imgAvatar->resize(600, 600);
+                    $imgAvatar->save($pathAvatar . '/' . $nameAvatar);
+                }
+            }
+            if ($request->file('cover')) {
+                $file = $request->file('cover');
+                $extends = $file->getClientOriginalExtension();
+
+                //Move Uploaded File
+                $destinationPath = 'themes/cover/' . date('Y/m/d');
+                $name = \Str::slug($request->name) . '.' . $extends;
+
+                $path = public_path($destinationPath);
+                \File::isDirectory($path) or \File::makeDirectory($path, 0777, true, true);
+
+                $request->file('cover')->move($path, $name);
+                $item->cover = $destinationPath . '/' . $name;
+
+                if ($file->getClientOriginalExtension() != 'gif') {
+                    // copy($file->getRealPath(), $destination);
+                    ImageManagerStatic::configure(array('driver' => 'imagick'));
+                    // open an image file
+                    $img = ImageManagerStatic::make($path . '/' . $name);
+                    // resize image instance
+                    $img->resize(600, 600);
+                    $img->save($path . '/' . $name);
+                }
+            }
+        }
         $item->save();
 
         return redirect('/cms/categories/' . $item->id)->withSuccess('Cập nhật danh mục thành công.');

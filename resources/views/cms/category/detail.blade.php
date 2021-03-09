@@ -46,6 +46,36 @@
                         </div>
                     </div>
                 </div>
+                @if($item->type == 2)
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Avatar:</label>
+                                @if(isset($item->avatar))
+                                    <div><img style="max-width: 200px;" src="{{  $item->getAvatarUrl() }}"
+                                              alt="{{  $item->getAvatarUrl() }}">
+                                    </div>
+                                @else
+                                    <p style="font-style: italic">None</p>
+                                @endif
+                            </div>
+                        </div>
+                    </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>Cover:</label>
+                                    @if(isset($item->cover))
+                                        <div><img style="max-width: 200px;" src="{{  $item->getCoverUrl() }}"
+                                                  alt="{{  $item->getCoverUrl() }}">
+                                        </div>
+                                    @else
+                                        <p style="font-style: italic">None</p>
+                                    @endif
+                                </div>
+                            </div>
+                        </div>
+                @endif
                 <div class="row">
                     <div class="col-md-6">
                         <div class="form-group">

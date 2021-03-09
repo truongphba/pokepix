@@ -16,7 +16,7 @@
             </div>
             <div class="card-body">
                 <form id="product_form" method="post"
-                      action="/cms/categories/{{  $item->id  }}/edit">
+                      action="/cms/categories/{{  $item->id  }}/edit" enctype="multipart/form-data">
                     @csrf
                     <div class="row">
                         <div class="col-md-6">
@@ -54,6 +54,32 @@
                             </div>
                         </div>
                     </div>
+                    @if($item->type == 2)
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="avatar">Avatar:</label>
+                                    <input type="file" name="avatar" class="form-control-file" id="avatar">
+                                    @error('avatar')
+                                    <p style="color: red">{{ $message }}</p>
+                                    @enderror
+                                    <img style="max-width: 200px; margin: 20px 0;" id="avatar-img" src="{{$item->getAvatarUrl()}}"/>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="cover">Cover:</label>
+                                    <input type="file" name="cover" class="form-control-file" id="cover">
+                                    @error('cover')
+                                    <p style="color: red">{{ $message }}</p>
+                                    @enderror
+                                    <img style="max-width: 200px; margin: 20px 0;" id="cover-img" src="{{$item->getCoverUrl()}}"/>
+                                </div>
+                            </div>
+                        </div>
+                    @endif
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-group">
@@ -76,4 +102,29 @@
             </div>
         </div>
     </div>
+@endsection
+@section('script')
+    <script>
+        $('#avatar').change(function () {
+            readURL(this, '#avatar-img');
+        });
+        $('#cover').change(function () {
+            readURL(this, '#cover-img');
+        });
+        function readURL(input, id) {
+            if (input.files && input.files[0]) {
+                var reader = new FileReader();
+
+                reader.onload = function (e) {
+                    $(id)
+                        .attr('src', e.target.result);
+                };
+
+                reader.readAsDataURL(input.files[0]);
+            } else {
+                $(id)
+                    .attr('src', '');
+            }
+        }
+    </script>
 @endsection

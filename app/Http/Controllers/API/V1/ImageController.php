@@ -202,6 +202,8 @@ class ImageController extends Controller
                 }
                 if ($category->pivot->type == 2) {
                     $item->theme = $category->name;
+                    $item->avatar = $category->avatar;
+                    $item->cover = $category->cover;
                 }
             }
             unset($list[$key]->categories);

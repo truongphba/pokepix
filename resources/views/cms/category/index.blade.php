@@ -67,6 +67,8 @@
                                 <th class="text-center">Id</th>
                                 <th>Position</th>
                                 <th>Name</th>
+                                <th>Avatar</th>
+                                <th>Cover</th>
                                 <th>Created At</th>
                             </tr>
                             </thead>
@@ -84,6 +86,16 @@
                                         </form>
                                     </td>
                                     <td>{{$item->name}}</td>
+                                    <td class="text-center">
+                                        @if($item->getAvatarUrl())
+                                        <img src="{{$item->getAvatarUrl()}}" style="width: auto; height:70px;">
+                                        @endif
+                                    </td>
+                                    <td class="text-center">
+                                        @if($item->getCoverUrl())
+                                            <img src="{{$item->getCoverUrl()}}" style="width: auto; height:70px;">
+                                        @endif
+                                    </td>
                                     <td>{{date_format($item->created_at, 'Y-m-d H:i:s')}}</td>
                                 </tr>
                             @endforeach
