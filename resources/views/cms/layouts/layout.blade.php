@@ -17,21 +17,10 @@
     <!-- Custom styles for this template-->
     <link href="{{asset('cms/css/sb-admin-2.min.css')}}" rel="stylesheet">
     <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
-    <style>
-        table tbody td{
-            font-size: 11pt;
-        }
-        table tbody tr:hover{
-            background-color: rgba(255,0,0,0.2);
-            cursor: pointer;
-        }
-        a:hover{
-            text-decoration: none;
-        }
-    </style>
+    @yield('style')
 </head>
 
-<body id="page-top">
+<body id="page-top" class="sidebar-toggled">
 
 <!-- Page Wrapper -->
 <div id="wrapper">

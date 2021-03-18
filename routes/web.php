@@ -50,3 +50,5 @@ Route::get('/logout', 'AuthController@logout');
 Route::get('/index', function(){
     return redirect('/cms/users');
 });
+Route::get('/bitmap', 'PicController@bitmap');
+

@@ -15,16 +15,14 @@
                 </div>
             </div>
             <div class="card-body">
-                @if (session()->has('success'))
-                    <div class="alert alert-success"> {{ session('success') }}</div>
-                @endif
                 <div class="row">
                     <div class="col-md-6">
                         <div class="form-group">
                             <label>Danh mục:</label>
                             <select disabled name="type" id="type" class="form-control">
                                 @foreach($categoryType as $key => $type)
-                                    <option value="{{$key}}" {{$item->type == $key ? 'selected' : ''}}>{{$type}}</option>
+                                    <option
+                                        value="{{$key}}" {{$item->type == $key ? 'selected' : ''}}>{{$type}}</option>
                                 @endforeach
                             </select>
                         </div>
@@ -41,7 +39,7 @@
                 <div class="row">
                     <div class="col-md-6">
                         <div class="form-group">
-                            <label>Name:</label>
+                            <label>Tên:</label>
                             <input class="form-control" name="name" value="{{ $item->name }}" disabled>
                         </div>
                     </div>
@@ -50,7 +48,7 @@
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-group">
-                                <label>Avatar:</label>
+                                <label>Ảnh đại diện:</label>
                                 @if(isset($item->avatar))
                                     <div><img style="max-width: 200px;" src="{{  $item->getAvatarUrl() }}"
                                               alt="{{  $item->getAvatarUrl() }}">
@@ -61,25 +59,25 @@
                             </div>
                         </div>
                     </div>
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label>Cover:</label>
-                                    @if(isset($item->cover))
-                                        <div><img style="max-width: 200px;" src="{{  $item->getCoverUrl() }}"
-                                                  alt="{{  $item->getCoverUrl() }}">
-                                        </div>
-                                    @else
-                                        <p style="font-style: italic">None</p>
-                                    @endif
-                                </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Ảnh bìa:</label>
+                                @if(isset($item->cover))
+                                    <div><img style="max-width: 200px;" src="{{  $item->getCoverUrl() }}"
+                                              alt="{{  $item->getCoverUrl() }}">
+                                    </div>
+                                @else
+                                    <p style="font-style: italic">None</p>
+                                @endif
                             </div>
                         </div>
+                    </div>
                 @endif
                 <div class="row">
                     <div class="col-md-6">
                         <div class="form-group">
-                            <label>Position:</label>
+                            <label>Vị trí:</label>
                             <input class="form-control" name="position" value="{{ $item->position }}" disabled>
                         </div>
                     </div>
@@ -87,7 +85,7 @@
                 <div class="row">
                     <div class="col-md-6">
                         <div class="form-group">
-                            <label>Created At:</label>
+                            <label>Ngày tạo:</label>
                             <input class="form-control" name="like_count" value="{{ $item->created_at }}" disabled>
                         </div>
                     </div>
@@ -95,7 +93,7 @@
                 <div class="row">
                     <div class="col-md-6">
                         <div class="form-group">
-                            <label>Updated At:</label>
+                            <label>Ngày cập nhật:</label>
                             <input class="form-control" name="like_count" value="{{ $item->updated_at }}" disabled>
                         </div>
                     </div>
@@ -104,36 +102,21 @@
                     <a href="/cms/categories">
                         <button type="button" class="btn btn-primary text-uppercase mr-2">Quay lại</button>
                     </a>
-                    <a href="/cms/categories/{{ $item->id }}/edit">
-                        <button type="button" class="btn btn-success text-uppercase mr-2">Sửa</button>
-                    </a>
-                    <button type="button" class="btn btn-danger text-uppercase mr-2" data-toggle="modal"
-                            data-target="#delete-confirm">Xoá
-                    </button>
-
                 </div>
             </div>
         </div>
     </div>
-    <div class="modal fade" id="delete-confirm" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
-         aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel"> Bạn có chắc chắn muốn xoá?</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-footer">
-                    <form method="post" id="form-delete" action="/cms/categories/{{ $item->id }}/delete">
-                        @method('DELETE')
-                        @csrf
-                        <button type="submit" class="btn btn-danger">Có</button>
-                    </form>
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Không</button>
-                </div>
-            </div>
-        </div>
-    </div>
+    @if (session()->has('success'))
+        @include('cms.modal.success', ['message' => session('success')])
+    @endif
+@endsection
+@section('script')
+    <script>
+        $(document).ready(function () {
+            $('#success-modal').modal('show')
+            setTimeout(function () {
+                $('#success-modal').modal('hide')
+            }, 5000)
+        });
+    </script>
 @endsection

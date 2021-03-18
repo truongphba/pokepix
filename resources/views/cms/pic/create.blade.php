@@ -20,10 +20,10 @@
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-group">
-                                <label>Name:</label>
-                                <input class="form-control" name="name" {{old('name')}} maxlength="255">
+                                <label>Tên (*):</label>
+                                <input class="form-control" name="name" value="{{old('name')}}" maxlength="255">
                                 @error('name')
-                                <p style="color: red">{{ $message }}</p>
+                                <p class="err" style="color: red">{{ $message }}</p>
                                 @enderror
                             </div>
                         </div>
@@ -31,11 +31,11 @@
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-group">
-                                <label>Position:</label>
-                                <input type="number" class="form-control" name="position"
-                                       {{old('position')}} maxlength="255">
+                                <label>Vị trí:</label>
+                                <input class="form-control" name="position"
+                                       value="{{old('position')}}" maxlength="255">
                                 @error('position')
-                                <p style="color: red">{{ $message }}</p>
+                                <p class="err" style="color: red">{{ $message }}</p>
                                 @enderror
                             </div>
                         </div>
@@ -43,11 +43,12 @@
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-group">
-                                <label>Category:</label>
+                                <label>Thể loại:</label>
                                 <select name="category_id" id="category_id" class="form-control">
                                     <option value="">-- Chọn category --</option>
                                     @foreach($categories as $category)
-                                        <option value="{{$category->id}}">{{$category->name}}</option>
+                                        <option
+                                            {{ old('category_id') == $category->id ? 'selected' : ''  }} value="{{$category->id}}">{{$category->name}}</option>
                                     @endforeach
                                 </select>
                             </div>
@@ -56,23 +57,31 @@
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-group">
-                                <label>Theme:</label>
+                                <label>Chủ đề:</label>
                                 <select name="theme_id" id="theme_id" class="form-control">
                                     <option value="">-- Chọn theme --</option>
                                     @foreach($themes as $theme)
-                                        <option value="{{$theme->id}}">{{$theme->name}}</option>
+                                        <option
+                                            {{ old('theme_id') == $theme->id ? 'selected' : ''  }} value="{{$theme->id}}">{{$theme->name}}</option>
                                     @endforeach
                                 </select>
                             </div>
                         </div>
                     </div>
-                    <div class="form-group">
-                        <label for="file">File</label>
-                        <input type="file" name="file" class="form-control-file" id="file">
-                        @error('file')
-                        <p style="color: red">{{ $message }}</p>
-                        @enderror
-                        <img style="max-width: 600px; margin: 20px 0;" id="blah" src=""/>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="file">Hình ảnh (*):</label>
+                                <input style="display: none" type="file" name="file" class="form-control-file" id="file" accept="image/png,image/jpg,image/jpeg">
+                                <div>
+                                <button type="button" class="btn btn-primary choose-file">Chọn tệp</button>
+                                </div>
+                                @error('file')
+                                <p class="err" style="color: red">{{ $message }}</p>
+                                @enderror
+                                <img style="max-width: 200px; margin: 20px 0;" id="blah" src=""/>
+                            </div>
+                        </div>
                     </div>
                     <div class="form-group">
                         <a href="/cms/pics">
@@ -106,5 +115,22 @@
                     .attr('src', '');
             }
         }
+
+        $('.err').each(function () {
+            $(this).prev().not('div').css('border', 'solid red 1px')
+        })
+        $('form input').keydown(function(){
+            let border = '1px solid #d1d3e2';
+            if ($(this).prev().attr('type') == 'file') {
+                border = 'none'
+            }
+            $(this).css('border', border)
+            $(this).parent().find('.err').remove()
+        })
+
+        $(".choose-file").click(function () {
+            $(this).parent().parent().find('.err').remove();
+            $(this).parent().prev().trigger('click');
+        });
     </script>
 @endsection

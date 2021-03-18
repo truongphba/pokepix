@@ -1,8 +1,15 @@
 @extends('cms.layouts.layout')
 @section('style')
     <style>
-        .select-active {
-            display: none;
+        .tableFixHead {
+            overflow-y: auto;
+            max-height: 400px;
+        }
+        .tableFixHead thead th {
+            position: sticky;
+            top: 0;
+            border-color: white!important;
+            z-index: 10;
         }
     </style>
 @endsection
@@ -53,42 +60,39 @@
                 </div>
             </div>
             <div class="card-body">
-                @if (session()->has('success'))
-                    <div class="alert alert-success"> {{ session('success') }}</div>
-                @endif
-                @error('position')
-                <div class="alert alert-danger"> {{ $message }}</div>
-                @enderror
                 @if(count($list) > 0)
-                    <div class="table-responsive">
+                    <div class="table-responsive tableFixHead">
                         <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
-                            <thead>
+                            <thead class="thead-dark">
                             <tr>
                                 <th class="text-center">Id</th>
-                                <th>Position</th>
-                                <th>Name</th>
-                                <th>Avatar</th>
-                                <th>Cover</th>
-                                <th>Created At</th>
+                                <th>Vị trí</th>
+                                <th>Tên</th>
+                                <th>Danh mục</th>
+                                <th>Ảnh đại diện</th>
+                                <th>Ảnh bìa</th>
+                                <th>Ngày tạo</th>
+                                <th>Thao tác</th>
                             </tr>
                             </thead>
                             <tbody>
                             @foreach($list as $item)
                                 <tr>
                                     <td class="text-center">{{$item->id}}</td>
-                                    <td style="width: 20%">
+                                    <td style="width: 10%">
                                         <form
                                             action="/cms/categories/{{$item->id}}/updatePosition"
                                             method="POST">
                                             @csrf
-                                            <input class="form-control" name="position" type="number"
-                                                   value="{{$item->position}}" {{old('position')}} maxlength="255">
+                                            <input class="form-control" name="position"
+                                                   value="{{$item->position}}" maxlength="255">
                                         </form>
                                     </td>
                                     <td>{{$item->name}}</td>
+                                    <td>{{ config('global.categories_type')[$item->type]}}</td>
                                     <td class="text-center">
                                         @if($item->getAvatarUrl())
-                                        <img src="{{$item->getAvatarUrl()}}" style="width: auto; height:70px;">
+                                            <img src="{{$item->getAvatarUrl()}}" style="width: auto; height:70px;">
                                         @endif
                                     </td>
                                     <td class="text-center">
@@ -97,12 +101,22 @@
                                         @endif
                                     </td>
                                     <td>{{date_format($item->created_at, 'Y-m-d H:i:s')}}</td>
+                                    <td>
+                                        <div class="row">
+                                            <div class="col-6 text-center">
+                                                <a href="/cms/categories/{{$item->id}}/edit" style="color: darkorange"><i class="fas fa-edit"></i></a>
+                                            </div>
+                                            <div class="col-6 text-center">
+                                                <a class="delete" href="#" style="color: #b91d19" data="{{$item->id}}"><i class="fas fa-trash-alt"></i></a>
+                                            </div>
+                                        </div>
+                                    </td>
                                 </tr>
                             @endforeach
                             </tbody>
                         </table>
                     </div>
-                    <div class="row">
+                    <div class="row mt-2">
                         <div class="col-md-6">
                             <p>Hiển thị từ {{$list->firstItem()}} đến {{$list->lastItem()}} của {{$list->total()}} bản
                                 ghi</p>
@@ -119,6 +133,33 @@
             </div>
         </div>
     </div>
+    @if (session()->has('success'))
+        @include('cms.modal.success', ['message' => session('success')])
+    @endif
+    @error('position')
+    @include('cms.modal.success', ['message' => $message ])
+    @enderror
+    <div class="modal fade" id="delete-confirm" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+         aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel"> Bạn có chắc chắn muốn xoá?</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-footer">
+                    <form method="post" id="form-delete" action="">
+                        @method('DELETE')
+                        @csrf
+                        <button type="submit" class="btn btn-danger">Có</button>
+                    </form>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Không</button>
+                </div>
+            </div>
+        </div>
+    </div>
 @endsection
 @section('script')
     <script>
@@ -130,7 +171,18 @@
         });
         $('#type').change(function () {
             const type = $(this).val();
-            window.location.href = '/cms/categories?type=' + type ;
+            window.location.href = '/cms/categories?type=' + type;
         });
+
+        $('#success-modal').modal('show')
+        setTimeout(function () {
+            $('#success-modal').modal('hide')
+        }, 5000)
+
+        $('.delete').click( function () {
+            const id = $(this).attr('data')
+            $('#delete-confirm form').attr('action','/cms/categories/' + id + '/delete')
+            $('#delete-confirm').modal('show')
+        })
     </script>
 @endsection

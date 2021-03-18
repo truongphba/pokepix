@@ -1,24 +1,31 @@
 @extends('cms.layouts.layout')
 @section('style')
     <style>
-        .select-active {
-            display: none;
+        .tableFixHead {
+            overflow-y: auto;
+            max-height: 400px;
+        }
+        .tableFixHead thead th {
+            position: sticky;
+            top: 0;
+            border-color: white!important;
+            z-index: 10;
         }
     </style>
 @endsection
-@section('title','Quản Lý User')
+@section('title','Quản Lý Người Dùng')
 @section('content')
     <div class="container-fluid">
         <!-- Page Heading -->
         <div class="d-sm-flex align-items-center justify-content-between mb-4">
-            <h1 class="h3 mb-0 text-gray-800">Quản Lý User</h1>
+            <h1 class="h3 mb-0 text-gray-800">Quản Lý Người Dùng</h1>
         </div>
 
         <div class="card shadow mb-4">
             <div class="card-header py-3">
                 <div class="row">
                     <div class="col-md-4 col-3">
-                        <h4 class="m-0 font-weight-bold text-primary">Danh sách User</h4>
+                        <h4 class="m-0 font-weight-bold text-primary">Danh sách Người Dùng</h4>
                     </div>
                     <div class="col-md-4 col-3">
                         <form class="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100 navbar-search">
@@ -41,22 +48,20 @@
                 </div>
             </div>
             <div class="card-body">
-                @if (session()->has('success'))
-                    <div class="alert alert-success"> {{ session('success') }}</div>
-                @endif
                 @if(count($list) > 0)
-                    <div class="table-responsive">
+                    <div class="table-responsive tableFixHead">
                         <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
-                            <thead>
+                            <thead class="thead-dark">
                             <tr>
                                 <th class="text-center">
                                     <input type="checkbox" class="form-check" id="check-all">
                                 </th>
                                 <th class="text-center">Id</th>
-                                <th>Name</th>
-                                <th>Device Id</th>
-                                <th>Like Count</th>
-                                <th>Created At</th>
+                                <th>Tên</th>
+                                <th>Id thiết bị</th>
+                                <th>Số lượt thích</th>
+                                <th>Ngày tạo</th>
+                                <th>Thao tác</th>
                             </tr>
                             </thead>
                             <tbody>
@@ -69,12 +74,22 @@
                                     <td>{{$item->device_id}}</td>
                                     <td>{{$item->likes_count}}</td>
                                     <td>{{date_format($item->created_at, 'Y-m-d H:i:s')}}</td>
+                                    <td>
+                                        <div class="row">
+                                            <div class="col-6 text-center">
+                                                <a href="/cms/users/{{$item->id}}/edit" style="color: darkorange"><i class="fas fa-edit"></i></a>
+                                            </div>
+                                            <div class="col-6 text-center">
+                                                <a class="delete" href="#" style="color: #b91d19" data="{{$item->id}}"><i class="fas fa-trash-alt"></i></a>
+                                            </div>
+                                        </div>
+                                    </td>
                                 </tr>
                             @endforeach
                             </tbody>
                         </table>
                     </div>
-                    <div class="row">
+                    <div class="row mt-2">
                         <div class="col-md-6">
                             <p>Hiển thị từ {{$list->firstItem()}} đến {{$list->lastItem()}} của {{$list->total()}} bản ghi</p>
                         </div>
@@ -90,6 +105,30 @@
             </div>
         </div>
     </div>
+    @if (session()->has('success'))
+        @include('cms.modal.success', ['message' => session('success')])
+    @endif
+    <div class="modal fade" id="delete-confirm" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+         aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel"> Bạn có chắc chắn muốn xoá?</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-footer">
+                    <form method="post" id="form-delete" action="">
+                        @method('DELETE')
+                        @csrf
+                        <button type="submit" class="btn btn-danger">Có</button>
+                    </form>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Không</button>
+                </div>
+            </div>
+        </div>
+    </div>
 @endsection
 @section('script')
     <script>
@@ -100,12 +139,15 @@
             $('#check-all').click(function () {
                 $('.product-checkbox').prop('checked', $(this).prop('checked'));
             });
+            $('.product-checkbox').click(function(){
+                $('#check-all').prop('checked',false);
+            })
             $('#delete-selected').click(function () {
                 var ids = $('.product-checkbox:checked').map(function(){
                     return $(this).val();
                 }).get();
                 if(ids.length == 0){
-                    alert('Vui lòng chọn ít nhất 1 hình ảnh.');
+                    alert('Vui lòng chọn ít nhất 1 người dùng.');
                     return;
                 }
                 if(confirm('Bạn có chắc chắn muốn xoá không ?')){
@@ -124,6 +166,15 @@
                         }
                     })
                 }
+            })
+            $('#success-modal').modal('show')
+            setTimeout(function () {
+                $('#success-modal').modal('hide')
+            }, 5000)
+            $('.delete').click( function () {
+                const id = $(this).attr('data')
+                $('#delete-confirm form').attr('action','/cms/users/' + id + '/delete')
+                $('#delete-confirm').modal('show')
             })
         });
     </script>

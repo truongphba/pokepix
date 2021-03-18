@@ -50,20 +50,21 @@ class CategoryController extends Controller
             'avatar' => 'file|mimes:jpeg,png,jpg|max:1024',
             'cover' => 'file|mimes:jpeg,png,jpg|max:1024'
         ], [
-            'name.required' => 'Name bắt buộc phải nhập.',
-            'position.numeric' => 'Position phải là 1 số.',
-            'position.min' => 'Position phải lớn hơn 0.',
+            'name.required' => 'Tên bắt buộc phải nhập.',
+            'position.numeric' => 'Vị trí phải là 1 số.',
+            'position.min' => 'Vị trí phải lớn hơn 0.',
             'type.required' => 'Bắt buộc phải chọn danh mục.',
-            'avatar.file' => 'avatar phải có định dạng jpeg, png, jpg',
-            'avatar.mimes' => 'avatar phải có định dạng jpeg, png, jpg',
-            'avatar.max' => 'avatar có kích thước tối đa là 1024kb',
-            'cover.file' => 'cover phải có định dạng jpeg, png, jpg',
-            'cover.mimes' => 'cover phải có định dạng jpeg, png, jpg',
-            'cover.max' => 'cover có kích thước tối đa là 1024kb'
+            'avatar.file' => 'Ảnh đại diện phải có định dạng jpeg, png, jpg',
+            'avatar.mimes' => 'Ảnh đại diện phải có định dạng jpeg, png, jpg',
+            'avatar.max' => 'Ảnh đại diện có kích thước tối đa là 1024kb',
+            'cover.file' => 'Chủ đề phải có định dạng jpeg, png, jpg',
+            'cover.mimes' => 'Chủ đề phải có định dạng jpeg, png, jpg',
+            'cover.max' => 'Chủ đề có kích thước tối đa là 1024kb'
         ]);
         $item = new Category();
         $item->name = $request->name;
-        $item->position = $request->position;
+        $position = $request->position == '' ? null : $request->position;
+        $item->position = $position;
         $item->type = $request->type;
         if ($request->type == 2){
             if ($request->file('avatar')) {
@@ -144,21 +145,22 @@ class CategoryController extends Controller
             'avatar' => 'file|mimes:jpeg,png,jpg|max:1024',
             'cover' => 'file|mimes:jpeg,png,jpg|max:1024'
         ], [
-            'name.required' => 'Name bắt buộc phải nhập.',
-            'position.numeric' => 'Position phải là 1 số.',
-            'position.min' => 'Position phải lớn hơn 0.',
+            'name.required' => 'Tên bắt buộc phải nhập.',
+            'position.numeric' => 'Vị trí phải là 1 số.',
+            'position.min' => 'Vị trí phải lớn hơn 0.',
             'type.required' => 'Bắt buộc phải chọn danh mục.',
-            'avatar.file' => 'avatar phải có định dạng jpeg, png, jpg',
-            'avatar.mimes' => 'avatar phải có định dạng jpeg, png, jpg',
-            'avatar.max' => 'avatar có kích thước tối đa là 1024kb',
-            'cover.file' => 'cover phải có định dạng jpeg, png, jpg',
-            'cover.mimes' => 'cover phải có định dạng jpeg, png, jpg',
-            'cover.max' => 'cover có kích thước tối đa là 1024kb'
+            'avatar.file' => 'Ảnh đại diện phải có định dạng jpeg, png, jpg',
+            'avatar.mimes' => 'Ảnh đại diện phải có định dạng jpeg, png, jpg',
+            'avatar.max' => 'Ảnh đại diện có kích thước tối đa là 1024kb',
+            'cover.file' => 'Chủ đề phải có định dạng jpeg, png, jpg',
+            'cover.mimes' => 'Chủ đề phải có định dạng jpeg, png, jpg',
+            'cover.max' => 'Chủ đề có kích thước tối đa là 1024kb'
         ]);
 
         $item = Category::find($id);
         $item->name = $request->name;
-        $item->position = $request->position;
+        $position = $request->position == '' ? null : $request->position;
+        $item->position = $position;
         $item->type = $request->type;
         if ($request->type == 2){
             if ($request->file('avatar')) {
@@ -220,7 +222,7 @@ class CategoryController extends Controller
         $item = Category::find($id);
         $item->delete();
 
-        return redirect('/cms/categories?type=' . $item->type)->withSuccess('Xoá danh mục thành công.');
+        return redirect()->back()->withSuccess('Xoá danh mục thành công.');
     }
 
     public function updatePosition(Request $request, $id)
@@ -228,13 +230,14 @@ class CategoryController extends Controller
         $request->validate([
             'position' => 'numeric|min:1|nullable'
         ], [
-            'position.numeric' => 'Position phải là 1 số.',
-            'position.min' => 'Position phải lớn hơn 0.',
+            'position.numeric' => 'Vị trí phải là 1 số.',
+            'position.min' => 'Vị trí phải lớn hơn 0.',
         ]);
 
         $item = Category::find($id);
-        $item->position = $request->position;
+        $position = $request->position == '' ? null : $request->position;
+        $item->position = $position;
         $item->save();
-        return redirect('/cms/categories?type=' . $item->type)->withSuccess('Cập nhật vị trí danh mục thành công.');
+        return redirect()->back()->withSuccess('Cập nhật vị trí danh mục thành công.');
     }
 }

@@ -20,15 +20,15 @@
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-group">
-                                <label>Danh mục:</label>
+                                <label>Danh mục (*):</label>
                                 <select name="type" id="type" class="form-control">
                                     <option value="">-- Chọn danh mục --</option>
                                     @foreach($categoryType as $key => $type)
-                                        <option value="{{$key}}">{{$type}}</option>
+                                        <option {{old('type') == $key ? 'selected' : ''}} value="{{$key}}">{{$type}}</option>
                                     @endforeach
                                 </select>
                                 @error('type')
-                                <p style="color: red">{{ $message }}</p>
+                                <p class="err" style="color: red">{{ $message }}</p>
                                 @enderror
                             </div>
                         </div>
@@ -36,10 +36,10 @@
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-group">
-                                <label>Name:</label>
-                                <input class="form-control" name="name" {{old('name')}} maxlength="255">
+                                <label>Tên (*):</label>
+                                <input class="form-control" name="name" value="{{old('name')}}" maxlength="255">
                                 @error('name')
-                                <p style="color: red">{{ $message }}</p>
+                                <p class="err" style="color: red">{{ $message }}</p>
                                 @enderror
                             </div>
                         </div>
@@ -48,10 +48,13 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label for="avatar">Avatar:</label>
-                                    <input type="file" name="avatar" class="form-control-file" id="avatar">
+                                    <label for="avatar">Ảnh đại diện:</label>
+                                    <input type="file" style="display: none" name="avatar" class="form-control-file" id="avatar" accept="image/png,image/jpg,image/jpeg">
+                                    <div>
+                                        <button type="button" class="btn btn-primary choose-file">Chọn tệp</button>
+                                    </div>
                                     @error('avatar')
-                                    <p style="color: red">{{ $message }}</p>
+                                    <p class="err" style="color: red">{{ $message }}</p>
                                     @enderror
                                     <img style="max-width: 200px; margin: 20px 0;" id="avatar-img" src=""/>
                                 </div>
@@ -60,10 +63,13 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label for="cover">Cover:</label>
-                                    <input type="file" name="cover" class="form-control-file" id="cover">
+                                    <label for="cover">Ảnh bìa:</label>
+                                    <input type="file" style="display: none" name="cover" class="form-control-file" id="cover" accept="image/png,image/jpg,image/jpeg">
+                                    <div>
+                                        <button type="button" class="btn btn-primary choose-file">Chọn tệp</button>
+                                    </div>
                                     @error('cover')
-                                    <p style="color: red">{{ $message }}</p>
+                                    <p class="err" style="color: red">{{ $message }}</p>
                                     @enderror
                                     <img style="max-width: 200px; margin: 20px 0;" id="cover-img" src=""/>
                                 </div>
@@ -73,10 +79,10 @@
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-group">
-                                <label>Position:</label>
-                                <input type="number" class="form-control" name="position" {{old('position')}} maxlength="255">
+                                <label>Vị trí:</label>
+                                <input class="form-control" name="position" value="{{old('position')}}" maxlength="255">
                                 @error('position')
-                                <p style="color: red">{{ $message }}</p>
+                                <p class="err" style="color: red">{{ $message }}</p>
                                 @enderror
                             </div>
                         </div>
@@ -94,6 +100,12 @@
 @endsection
 @section('script')
     <script>
+        if ($('#type').val() == 2){
+            $('#theme-type').show();
+        } else {
+            $('#theme-type').hide();
+        }
+
         $('#type').change(function(){
             let type = $(this).val();
             if (type == 2){
@@ -102,6 +114,7 @@
                 $('#theme-type').hide();
             }
         });
+
         $('#avatar').change(function () {
             readURL(this, '#avatar-img');
         });
@@ -123,5 +136,25 @@
                     .attr('src', '');
             }
         }
+
+        $('.err').each(function () {
+            $(this).prev().not('div').css('border', 'solid red 1px')
+        })
+        $('form input').keydown(function(){
+            let border = '1px solid #d1d3e2';
+            if ($(this).prev().attr('type') == 'file') {
+                border = 'none'
+            }
+            $(this).css('border', border)
+            $(this).parent().find('.err').remove()
+        })
+        $('#type').change(function (){
+            $(this).css('border', '1px solid #d1d3e2')
+            $(this).parent().find('.err').remove()
+        })
+        $(".choose-file").click(function () {
+            $(this).parent().parent().find('.err').remove();
+            $(this).parent().prev().trigger('click');
+        });
     </script>
 @endsection

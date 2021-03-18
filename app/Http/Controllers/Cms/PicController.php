@@ -92,13 +92,13 @@ class PicController extends Controller
             'file' => 'required|file|mimes:jpeg,png,jpg|max:1024',
             'position' => 'numeric|min:1|nullable'
         ], [
-            'name.required' => 'name bắt buộc phải nhập.',
-            'file.required' => 'file bắt buộc phải chọn.',
-            'file.file' => 'file phải có định dạng jpeg, png, jpg',
-            'file.mimes' => 'file phải có định dạng jpeg, png, jpg',
-            'file.max' => 'file có kích thước tối đa là 1024kb',
-            'position.numeric' => 'Position phải là 1 số.',
-            'position.min' => 'Position phải lớn hơn 0.'
+            'name.required' => 'Tên bắt buộc phải nhập.',
+            'file.required' => 'Hình ảnh bắt buộc phải chọn.',
+            'file.file' => 'Hình ảnh phải có định dạng jpeg, png, jpg',
+            'file.mimes' => 'Hình ảnh phải có định dạng jpeg, png, jpg',
+            'file.max' => 'Hình ảnh có kích thước tối đa là 1024kb',
+            'position.numeric' => 'Vị trí phải là 1 số.',
+            'position.min' => 'Vị trí phải lớn hơn 0.'
         ]);
 
         DB::beginTransaction();
@@ -130,7 +130,8 @@ class PicController extends Controller
             }
 
             $item->name = $request->name;
-            $item->position = $request->position;
+            $position = $request->position == '' ? null : $request->position;
+            $item->position = $position;
             $item->save();
 
             $data = [];
@@ -210,9 +211,12 @@ class PicController extends Controller
             'name' => 'required',
             'position' => 'numeric|min:1|nullable'
         ], [
-            'name.required' => 'name bắt buộc phải nhập.',
-            'position.numeric' => 'Position phải là 1 số.',
-            'position.min' => 'Position phải lớn hơn 0.'
+            'name.required' => 'Tên bắt buộc phải nhập.',
+            'file.file' => 'Hình ảnh phải có định dạng jpeg, png, jpg',
+            'file.mimes' => 'Hình ảnh phải có định dạng jpeg, png, jpg',
+            'file.max' => 'Hình ảnh có kích thước tối đa là 1024kb',
+            'position.numeric' => 'Vị trí phải là 1 số.',
+            'position.min' => 'Vị trí phải lớn hơn 0.'
         ]);
 
         DB::beginTransaction();
@@ -244,7 +248,8 @@ class PicController extends Controller
             }
 
             $item->name = $request->name;
-            $item->position = $request->position;
+            $position = $request->position == '' ? null : $request->position;
+            $item->position = $position;
             $item->save();
             if ($request->category_id) {
                 DB::table('category_pic')->updateOrInsert(['pic_id' => $item->id, 'type' => 1], ['category_id' => $request->category_id]);
@@ -277,7 +282,7 @@ class PicController extends Controller
         try {
             $item = Pic::find($id);
             $item->delete();
-            DB::table('category_pic')->where('pic_id' , $item->id)->delete();
+            DB::table('category_pic')->where('pic_id', $item->id)->delete();
 
             DB::commit();
         } catch (Exception $e) {
@@ -292,25 +297,27 @@ class PicController extends Controller
         $request->validate([
             'position' => 'numeric|min:1|nullable'
         ], [
-            'position.numeric' => 'Position phải là 1 số.',
-            'position.min' => 'Position phải lớn hơn 0.',
+            'position.numeric' => 'Vị trí phải là 1 số.',
+            'position.min' => 'Vị trí phải lớn hơn 0.',
         ]);
 
         $item = Pic::find($id);
         $msg = 'Cập nhật vị trí hình ảnh thành công.';
 
-        $item->position = $request->position;
+        $position = $request->position == '' ? null : $request->position;
+        $item->position = $position;
         $item->save();
         return redirect('/cms/pics')->withSuccess($msg);
     }
 
-    public function deleteSelected(Request $request){
+    public function deleteSelected(Request $request)
+    {
         $ids = $request->get('ids');
         DB::beginTransaction();
         try {
             $item = Pic::whereIn('id', $ids);
             $item->delete();
-            DB::table('category_pic')->whereIn('pic_id' , $ids)->delete();
+            DB::table('category_pic')->whereIn('pic_id', $ids)->delete();
             DB::commit();
             return $ids;
         } catch (Exception $e) {
@@ -319,87 +326,77 @@ class PicController extends Controller
         }
     }
 
-    public function bitmap(){
+    public function bitmap()
+    {
         function ImageCreateBMP($filename)
         {
 //Ouverture du fichier en mode binaire
-            if (! $f1 = fopen($filename,"rb")) return FALSE;
+            if (!$f1 = fopen($filename, "rb")) return FALSE;
 
 //1 : Chargement des ent�tes FICHIER
-            $FILE = unpack("vfile_type/Vfile_size/Vreserved/Vbitmap_offset", fread($f1,14));
+            $FILE = unpack("vfile_type/Vfile_size/Vreserved/Vbitmap_offset", fread($f1, 14));
             if ($FILE['file_type'] != 19778) return FALSE;
 
 //2 : Chargement des ent�tes BMP
-            $BMP = unpack('Vheader_size/Vwidth/Vheight/vplanes/vbits_per_pixel'.
-                '/Vcompression/Vsize_bitmap/Vhoriz_resolution'.
-                '/Vvert_resolution/Vcolors_used/Vcolors_important', fread($f1,40));
-            $BMP['colors'] = pow(2,$BMP['bits_per_pixel']);
+            $BMP = unpack('Vheader_size/Vwidth/Vheight/vplanes/vbits_per_pixel' .
+                '/Vcompression/Vsize_bitmap/Vhoriz_resolution' .
+                '/Vvert_resolution/Vcolors_used/Vcolors_important', fread($f1, 40));
+            $BMP['colors'] = pow(2, $BMP['bits_per_pixel']);
             if ($BMP['size_bitmap'] == 0) $BMP['size_bitmap'] = $FILE['file_size'] - $FILE['bitmap_offset'];
-            $BMP['bytes_per_pixel'] = $BMP['bits_per_pixel']/8;
+            $BMP['bytes_per_pixel'] = $BMP['bits_per_pixel'] / 8;
             $BMP['bytes_per_pixel2'] = ceil($BMP['bytes_per_pixel']);
-            $BMP['decal'] = ($BMP['width']*$BMP['bytes_per_pixel']/4);
-            $BMP['decal'] -= floor($BMP['width']*$BMP['bytes_per_pixel']/4);
-            $BMP['decal'] = 4-(4*$BMP['decal']);
+            $BMP['decal'] = ($BMP['width'] * $BMP['bytes_per_pixel'] / 4);
+            $BMP['decal'] -= floor($BMP['width'] * $BMP['bytes_per_pixel'] / 4);
+            $BMP['decal'] = 4 - (4 * $BMP['decal']);
             if ($BMP['decal'] == 4) $BMP['decal'] = 0;
 
 //3 : Chargement des couleurs de la palette
             $PALETTE = array();
-            if ($BMP['colors'] < 16777216)
-            {
-                $PALETTE = unpack('V'.$BMP['colors'], fread($f1,$BMP['colors']*4));
+            if ($BMP['colors'] < 16777216) {
+                $PALETTE = unpack('V' . $BMP['colors'], fread($f1, $BMP['colors'] * 4));
             }
 
 //4 : Cr�ation de l'image
-            $IMG = fread($f1,$BMP['size_bitmap']);
+            $IMG = fread($f1, $BMP['size_bitmap']);
             $VIDE = chr(0);
 
-            $res = imagecreatetruecolor($BMP['width'],$BMP['height']);
+            $res = imagecreatetruecolor($BMP['width'], $BMP['height']);
             $P = 0;
-            $Y = $BMP['height']-1;
-            while ($Y >= 0)
-            {
-                $X=0;
-                while ($X < $BMP['width'])
-                {
+            $Y = $BMP['height'] - 1;
+            while ($Y >= 0) {
+                $X = 0;
+                while ($X < $BMP['width']) {
                     if ($BMP['bits_per_pixel'] == 24)
-                        $COLOR = unpack("V",substr($IMG,$P,3).$VIDE);
-                    elseif ($BMP['bits_per_pixel'] == 16)
-                    {
-                        $COLOR = unpack("n",substr($IMG,$P,2));
-                        $COLOR[1] = $PALETTE[$COLOR[1]+1];
-                    }
-                    elseif ($BMP['bits_per_pixel'] == 8)
-                    {
-                        $COLOR = unpack("n",$VIDE.substr($IMG,$P,1));
-                        $COLOR[1] = $PALETTE[$COLOR[1]+1];
-                    }
-                    elseif ($BMP['bits_per_pixel'] == 4)
-                    {
-                        $COLOR = unpack("n",$VIDE.substr($IMG,floor($P),1));
-                        if (($P*2)%2 == 0) $COLOR[1] = ($COLOR[1] >> 4) ; else $COLOR[1] = ($COLOR[1] & 0x0F);
-                        $COLOR[1] = $PALETTE[$COLOR[1]+1];
-                    }
-                    elseif ($BMP['bits_per_pixel'] == 1)
-                    {
-                        $COLOR = unpack("n",$VIDE.substr($IMG,floor($P),1));
-                        if     (($P*8)%8 == 0) $COLOR[1] =  $COLOR[1]        >>7;
-                        elseif (($P*8)%8 == 1) $COLOR[1] = ($COLOR[1] & 0x40)>>6;
-                        elseif (($P*8)%8 == 2) $COLOR[1] = ($COLOR[1] & 0x20)>>5;
-                        elseif (($P*8)%8 == 3) $COLOR[1] = ($COLOR[1] & 0x10)>>4;
-                        elseif (($P*8)%8 == 4) $COLOR[1] = ($COLOR[1] & 0x8)>>3;
-                        elseif (($P*8)%8 == 5) $COLOR[1] = ($COLOR[1] & 0x4)>>2;
-                        elseif (($P*8)%8 == 6) $COLOR[1] = ($COLOR[1] & 0x2)>>1;
-                        elseif (($P*8)%8 == 7) $COLOR[1] = ($COLOR[1] & 0x1);
-                        $COLOR[1] = $PALETTE[$COLOR[1]+1];
-                    }
-                    else
+                        $COLOR = unpack("V", substr($IMG, $P, 3) . $VIDE);
+                    elseif ($BMP['bits_per_pixel'] == 16) {
+                        $COLOR = unpack("n", substr($IMG, $P, 2));
+                        $COLOR[1] = $PALETTE[$COLOR[1] + 1];
+                    } elseif ($BMP['bits_per_pixel'] == 8) {
+                        $COLOR = unpack("n", $VIDE . substr($IMG, $P, 1));
+                        $COLOR[1] = $PALETTE[$COLOR[1] + 1];
+                    } elseif ($BMP['bits_per_pixel'] == 4) {
+                        $COLOR = unpack("n", $VIDE . substr($IMG, floor($P), 1));
+                        if (($P * 2) % 2 == 0) $COLOR[1] = ($COLOR[1] >> 4); else $COLOR[1] = ($COLOR[1] & 0x0F);
+                        $COLOR[1] = $PALETTE[$COLOR[1] + 1];
+                    } elseif ($BMP['bits_per_pixel'] == 1) {
+                        $COLOR = unpack("n", $VIDE . substr($IMG, floor($P), 1));
+                        if (($P * 8) % 8 == 0) $COLOR[1] = $COLOR[1] >> 7;
+                        elseif (($P * 8) % 8 == 1) $COLOR[1] = ($COLOR[1] & 0x40) >> 6;
+                        elseif (($P * 8) % 8 == 2) $COLOR[1] = ($COLOR[1] & 0x20) >> 5;
+                        elseif (($P * 8) % 8 == 3) $COLOR[1] = ($COLOR[1] & 0x10) >> 4;
+                        elseif (($P * 8) % 8 == 4) $COLOR[1] = ($COLOR[1] & 0x8) >> 3;
+                        elseif (($P * 8) % 8 == 5) $COLOR[1] = ($COLOR[1] & 0x4) >> 2;
+                        elseif (($P * 8) % 8 == 6) $COLOR[1] = ($COLOR[1] & 0x2) >> 1;
+                        elseif (($P * 8) % 8 == 7) $COLOR[1] = ($COLOR[1] & 0x1);
+                        $COLOR[1] = $PALETTE[$COLOR[1] + 1];
+                    } else
                         return FALSE;
-                    imagesetpixel($res,$X,$Y,$COLOR[1]);
+                    imagesetpixel($res, $X, $Y, $COLOR[1]);
                     $X++;
                     $P += $BMP['bytes_per_pixel'];
                 }
                 $Y--;
-                $P+=$BMP['decal'];
+                $P += $BMP['decal'];
             }
 
 //Fermeture du fichier
@@ -407,16 +404,100 @@ class PicController extends Controller
 
             return $res;
         }
-        $resource = ImageCreateBMP(public_path('temp.bmp'));
+
+        $resource = ImageCreateBMP(public_path('test.bmp'));
         $width = imagesx($resource);
         $height = imagesy($resource);
+        $point = [
+            'x' => 500,
+            'y' => 500
+        ];
 
-        for($x = 0; $x < $width; $x++) {
-            for($y = 0; $y < $height; $y++) {
-                // pixel color at (x, y)
-                $color = imagecolorat($resource, $x, $y);
-                echo $color . '_' . $x . '_' . $y . '<br>';
+        $i = 1;
+        $result = [];
+        while (true) {
+            $a = [
+                'x' => $point['x'] + $i,
+                'y' => $point['y'] + $i
+            ];
+            if(imagecolorat($resource,$a['x'], $a['y']) == 0
+                || $a['x'] == 0
+                || $a['y'] == 0
+                || $a['x'] == $width
+                || $a['y'] == $height){
+                $result = $a;
+                break;
             }
+            $b = [
+                'x' => $point['x'] + $i,
+                'y' => $point['y'] - $i
+            ];
+            if(imagecolorat($resource,$b['x'] , $b['y']) == 0
+                || $b['x'] == 0
+                || $b['y'] == 0
+                || $b['x'] == $width
+                || $b['y'] == $height){
+                $result = $b;
+                break;
+            }
+            $c = [
+                'x' => $point['x'] - $i,
+                'y' => $point['y'] + $i
+            ];
+            if(imagecolorat($resource,$c['x'] , $c['y']) == 0
+                || $c['x'] == 0
+                || $c['y'] == 0
+                || $c['x'] == $width
+                || $c['y'] == $height){
+                $result = $c;
+                break;
+            }
+            $d = [
+                'x' => $point['x'] - $i,
+                'y' => $point['y'] - $i
+
+            ];
+            if(imagecolorat($resource,$d['x'] , $d['y']) == 0
+                || $d['x'] == 0
+                || $d['y'] == 0
+                || $d['x'] == $width
+                || $d['y'] == $height){
+                $result = $d;
+                break;
+            }
+            for ($j = 1; $j < $i * 2; $j++) {
+                if(imagecolorat($resource,$a['x'] - $j, $a['y']) == 0){
+                    $result = [
+                        'x' => $a['x'] - $j,
+                        'y' => $a['y']
+                    ];
+                    break;
+                }
+                if(imagecolorat($resource,$a['x'], $a['y']  - $j) == 0){
+                    $result = [
+                        'x' => $a['x'],
+                        'y' => $a['y'] - $j
+                    ];
+                    break;
+                }
+                if(imagecolorat($resource,$b['x'] - $j, $b['y']) == 0){
+                    $result = [
+                        'x' => $b['x'] - $j,
+                        'y' => $b['y']
+                    ];
+                    break;
+                }
+                if(imagecolorat($resource,$c['x'],$c['y'] - $j) == 0){
+                    $result = [
+                        'x' => $b['x'] - $j,
+                        'y' => $b['y']
+                    ];
+                    break;
+                }
+            }
+            if ($result) break;
+            $i++;
         }
+        dd($i);
     }
 }
