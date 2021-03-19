@@ -26,6 +26,19 @@
                 <div class="row">
                     <div class="col-md-6">
                         <div class="form-group">
+                            <label>Loại hình ảnh:</label>
+                            <select disabled name="type" id="type" class="form-control">
+                                @foreach($type as $key => $i)
+                                    <option
+                                        value="{{$key}}" {{$item->type == $key ? 'selected' : ''}}>{{$i}}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
                             <label>Tên:</label>
                             <input class="form-control" name="name" value="{{ $item->name }}" disabled>
                         </div>
@@ -51,20 +64,75 @@
                         </div>
                     </div>
                 </div>
-                <div class="row">
-                    <div class="col-md-6">
-                        <div class="form-group">
-                            <label>Hình ảnh:</label>
-                            @if(isset($item->file))
-                                <div><img style="max-width: 200px;" src="{{  $item->getFileUrl() }}"
-                                          alt="{{  $item->getFileUrl() }}">
-                                </div>
-                            @else
-                                <p style="font-style: italic">None</p>
-                            @endif
+                @if($item->type == 2)
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Ảnh pixel:</label>
+                                @if(isset($item->file))
+                                    <div><img style="max-width: 200px;" src="{{  $item->getFileUrl() }}"
+                                              alt="{{  $item->getFileUrl() }}">
+                                    </div>
+                                @else
+                                    <p style="font-style: italic">None</p>
+                                @endif
+                            </div>
                         </div>
                     </div>
-                </div>
+                @else
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="file">Ảnh svg:</label>
+                                @if(isset($item->svgImageURL))
+                                    <div><img style="max-width: 200px;" src="{{  $item->getSvgImageUrl() }}"
+                                              alt="{{  $item->getSvgImageUrl() }}">
+                                    </div>
+                                @else
+                                    <p style="font-style: italic">None</p>
+                                @endif
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="file">Ảnh outline:</label>
+                                @if(isset($item->outlineImageURL))
+                                    <div><img style="max-width: 200px;" src="{{  $item->getOutlineImageUrl() }}"
+                                              alt="{{  $item->getOutlineImageUrl() }}">
+                                    </div>
+                                @else
+                                    <p style="font-style: italic">None</p>
+                                @endif
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="file">Ảnh original:</label>
+                                @if(isset($item->originalImageURL))
+                                    <div><img style="max-width: 200px;" src="{{  $item->getOriginalImageUrl() }}"
+                                              alt="{{  $item->getOriginalImageUrl() }}">
+                                    </div>
+                                @else
+                                    <p style="font-style: italic">None</p>
+                                @endif
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="file">Ảnh color:</label>
+                                @if(isset($item->colorImageURL))
+                                    <div><img style="max-width: 200px;" src="{{  $item->getColorImageUrl() }}"
+                                              alt="{{  $item->getColorImageUrl() }}">
+                                    </div>
+                                @else
+                                    <p style="font-style: italic">None</p>
+                                @endif
+                            </div>
+                        </div>
+                    </div>
+                @endif
                 <div class="row">
                     <div class="col-md-6">
                         <div class="form-group">

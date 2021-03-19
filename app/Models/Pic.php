@@ -10,7 +10,32 @@ class Pic extends Model
 
     public function getFileUrl()
     {
-        return url($this->file);
+        if($this->file) return url($this->file);
+        return null;
+    }
+
+    public function getSvgImageUrl()
+    {
+        if($this->svgImageURL) return url($this->svgImageURL);
+        return null;
+    }
+
+    public function getOutlineImageUrl()
+    {
+        if($this->outlineImageURL) return url($this->outlineImageURL);
+        return null;
+    }
+
+    public function getOriginalImageUrl()
+    {
+        if($this->outlineImageURL) return url($this->originalImageURL);
+        return null;
+    }
+
+    public function getColorImageUrl()
+    {
+        if($this->outlineImageURL) return url($this->colorImageURL);
+        return null;
     }
 
     public function categories(){

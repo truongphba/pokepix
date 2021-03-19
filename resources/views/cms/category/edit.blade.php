@@ -37,6 +37,22 @@
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-group">
+                                <label>Loại danh mục (*):</label>
+                                <select  name="picType" id="picType" class="form-control">
+                                    @foreach($picType as $key => $type)
+                                        <option
+                                            value="{{$key}}" {{$key == old('type', $item->pic_type) ? 'selected' : ''}}>{{$type}}</option>
+                                    @endforeach
+                                </select>
+                                @error('picType')
+                                <p class="err" style="color: red">{{ $message }}</p>
+                                @enderror
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
                                 <label>Id:</label>
                                 <input class="form-control" name="id" value="{{ $item->id }}" disabled>
                             </div>
@@ -145,6 +161,10 @@
             $(this).parent().find('.err').remove()
         })
         $('#type').change(function (){
+            $(this).css('border', '1px solid #d1d3e2')
+            $(this).parent().find('.err').remove()
+        })
+        $('#picType').change(function (){
             $(this).css('border', '1px solid #d1d3e2')
             $(this).parent().find('.err').remove()
         })

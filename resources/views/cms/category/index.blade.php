@@ -69,6 +69,7 @@
                                 <th>Vị trí</th>
                                 <th>Tên</th>
                                 <th>Danh mục</th>
+                                <th>Loại danh mục</th>
                                 <th>Ảnh đại diện</th>
                                 <th>Ảnh bìa</th>
                                 <th>Ngày tạo</th>
@@ -90,6 +91,7 @@
                                     </td>
                                     <td>{{$item->name}}</td>
                                     <td>{{ config('global.categories_type')[$item->type]}}</td>
+                                    <td>{{ config('global.pic_type')[$item->pic_type]}}</td>
                                     <td class="text-center">
                                         @if($item->getAvatarUrl())
                                             <img src="{{$item->getAvatarUrl()}}" style="width: auto; height:70px;">

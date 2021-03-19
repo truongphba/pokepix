@@ -72,31 +72,60 @@ class PicController extends Controller
             ]);
     }
 
-    public function create()
+    public function create(Request $request)
     {
+        $type = config('global.pic_type');
+        unset($type[1]);
+        $currentType = null;
+        if ($request->type) {
+            $currentType = $request->type;
+        }
         $categories = Category::orderByRaw('ISNULL(position), position ASC')
+            ->whereIn('pic_type', [$currentType, 1])
             ->where('type', 1)
             ->orderBy('created_at', 'DESC')
             ->get();
         $themes = Category::orderByRaw('ISNULL(position), position ASC')
+            ->whereIn('pic_type', [$currentType, 1])
             ->where('type', 2)
             ->orderBy('created_at', 'DESC')
             ->get();
-        return view('cms.pic.create', ['categories' => $categories, 'themes' => $themes]);
+        return view('cms.pic.create', [
+            'categories' => $categories,
+            'themes' => $themes,
+            'type' => $type,
+            'currentType' => $currentType]);
     }
 
     public function store(Request $request)
     {
         $request->validate([
             'name' => 'required',
-            'file' => 'required|file|mimes:jpeg,png,jpg|max:1024',
+            'type' => 'required',
+            'file' => 'file|mimes:jpeg,png,jpg|max:1024',
+            'svgImageUrl' => 'file|mimes:jpeg,png,jpg|max:1024',
+            'outlineImageUrl' => 'file|mimes:jpeg,png,jpg|max:1024',
+            'originalImageUrl' => 'file|mimes:jpeg,png,jpg|max:1024',
+            'colorImageUrl' => 'file|mimes:jpeg,png,jpg|max:1024',
             'position' => 'numeric|min:1|nullable'
         ], [
             'name.required' => 'Tên bắt buộc phải nhập.',
-            'file.required' => 'Hình ảnh bắt buộc phải chọn.',
-            'file.file' => 'Hình ảnh phải có định dạng jpeg, png, jpg',
-            'file.mimes' => 'Hình ảnh phải có định dạng jpeg, png, jpg',
-            'file.max' => 'Hình ảnh có kích thước tối đa là 1024kb',
+            'type.required' => 'Tên bắt buộc phải chọn.',
+            'file.file' => 'Ảnh pixel phải có định dạng jpeg, png, jpg',
+            'svgImageUrl.file' => 'Ảnh svg phải có định dạng jpeg, png, jpg',
+            'outlineImageUrl.file' => 'Ảnh outline phải có định dạng jpeg, png, jpg',
+            'originalImageUrl.file' => 'Ảnh original phải có định dạng jpeg, png, jpg',
+            'colorImageUrl.file' => 'Ảnh color phải có định dạng jpeg, png, jpg',
+            'file.mimes' => 'Ảnh pixel phải có định dạng jpeg, png, jpg',
+            'svgImageUrl.mimes' => 'Ảnh svg phải có định dạng jpeg, png, jpg',
+            'outlineImageUrl.mimes' => 'Ảnh outline phải có định dạng jpeg, png, jpg',
+            'originalImageUrl.mimes' => 'Ảnh original phải có định dạng jpeg, png, jpg',
+            'colorImageUrl.mimes' => 'Ảnh color phải có định dạng jpeg, png, jpg',
+            'file.max' => 'Ảnh pixel có kích thước tối đa là 1024kb',
+            'svgImageUrl.max' => 'Ảnh svg có kích thước tối đa là 1024kb',
+            'outlineImageUrl.max' => 'Ảnh outline có kích thước tối đa là 1024kb',
+            'originalImageUrl.max' => 'Ảnh original có kích thước tối đa là 1024kb',
+            'colorImageUrl.max' => 'Ảnh color có kích thước tối đa là 1024kb',
             'position.numeric' => 'Vị trí phải là 1 số.',
             'position.min' => 'Vị trí phải lớn hơn 0.'
         ]);
@@ -104,32 +133,43 @@ class PicController extends Controller
         DB::beginTransaction();
         try {
             $item = new Pic();
-            if ($request->file('file')) {
-                $file = $request->file('file');
+            foreach ($request->file() as $key => $file) {
                 $extends = $file->getClientOriginalExtension();
 
                 //Move Uploaded File
-                $destinationPath = 'pic/' . date('Y/m/d');
+                if($key == 'file') {
+                    $folder = 'pic/';
+                } else if($key == 'svgImageUrl'){
+                    $folder = 'svg/';
+                } else if ($key == 'outlineImageUrl') {
+                    $folder = 'outline/';
+                } else if ($key == 'originalImageUrl') {
+                    $folder = 'original/';
+                } else {
+                    $folder = 'color/';
+                }
+                $destinationPath = $folder . date('Y/m/d');
                 $name = \Str::slug($request->name) . '.' . $extends;
 
                 $path = public_path($destinationPath);
                 \File::isDirectory($path) or \File::makeDirectory($path, 0777, true, true);
 
-                $request->file('file')->move($path, $name);
-                $item->file = $destinationPath . '/' . $name;
+                $file->move($path, $name);
+                $item->$key = $destinationPath . '/' . $name;
 
-                if ($file->getClientOriginalExtension() != 'gif') {
-                    // copy($file->getRealPath(), $destination);
-                    ImageManagerStatic::configure(array('driver' => 'imagick'));
-                    // open an image file
-                    $img = ImageManagerStatic::make($path . '/' . $name);
-                    // resize image instance
-                    $img->resize(600, 600);
-                    $img->save($path . '/' . $name);
-                }
+//                if ($file->getClientOriginalExtension() != 'gif') {
+//                    // copy($file->getRealPath(), $destination);
+//                    ImageManagerStatic::configure(array('driver' => 'imagick'));
+//                    // open an image file
+//                    $img = ImageManagerStatic::make($path . '/' . $name);
+//                    // resize image instance
+//                    $img->resize(600, 600);
+//                    $img->save($path . '/' . $name);
+//                }
             }
 
             $item->name = $request->name;
+            $item->type = $request->type;
             $position = $request->position == '' ? null : $request->position;
             $item->position = $position;
             $item->save();
@@ -164,6 +204,8 @@ class PicController extends Controller
     public function detail($id)
     {
         $item = Pic::find($id);
+        $type = config('global.pic_type');
+        unset($type[1]);
         $item->category = '';
         $item->theme = '';
         foreach ($item->categories as $category) {
@@ -174,11 +216,13 @@ class PicController extends Controller
                 $item->theme = $category->name;
             }
         }
-        return view('cms.pic.detail', ['item' => $item]);
+        return view('cms.pic.detail', ['item' => $item, 'type' => $type]);
     }
 
     public function edit($id)
     {
+        $type = config('global.pic_type');
+        unset($type[1]);
         $item = Pic::find($id);
         $item->category_id = '';
         $item->theme_id = '';
@@ -195,26 +239,45 @@ class PicController extends Controller
             }
         }
         $categories = Category::orderByRaw('ISNULL(position), position ASC')
+            ->whereIn('pic_type', [$item->type, 1])
             ->where('type', 1)
             ->orderBy('created_at', 'DESC')
             ->get();
         $themes = Category::orderByRaw('ISNULL(position), position ASC')
+            ->whereIn('pic_type', [$item->type, 1])
             ->where('type', 2)
             ->orderBy('created_at', 'DESC')
             ->get();
-        return view('cms.pic.edit', ['item' => $item, 'categories' => $categories, 'themes' => $themes]);
+        return view('cms.pic.edit', ['item' => $item, 'categories' => $categories, 'themes' => $themes, 'type' => $type]);
     }
 
     public function update(Request $request, $id)
     {
         $request->validate([
             'name' => 'required',
+            'file' => 'file|mimes:jpeg,png,jpg|max:1024',
+            'svgImageUrl' => 'file|mimes:jpeg,png,jpg|max:1024',
+            'outlineImageUrl' => 'file|mimes:jpeg,png,jpg|max:1024',
+            'originalImageUrl' => 'file|mimes:jpeg,png,jpg|max:1024',
+            'colorImageUrl' => 'file|mimes:jpeg,png,jpg|max:1024',
             'position' => 'numeric|min:1|nullable'
         ], [
             'name.required' => 'Tên bắt buộc phải nhập.',
-            'file.file' => 'Hình ảnh phải có định dạng jpeg, png, jpg',
-            'file.mimes' => 'Hình ảnh phải có định dạng jpeg, png, jpg',
-            'file.max' => 'Hình ảnh có kích thước tối đa là 1024kb',
+            'file.file' => 'Ảnh pixel phải có định dạng jpeg, png, jpg',
+            'svgImageUrl.file' => 'Ảnh svg phải có định dạng jpeg, png, jpg',
+            'outlineImageUrl.file' => 'Ảnh outline phải có định dạng jpeg, png, jpg',
+            'originalImageUrl.file' => 'Ảnh original phải có định dạng jpeg, png, jpg',
+            'colorImageUrl.file' => 'Ảnh color phải có định dạng jpeg, png, jpg',
+            'file.mimes' => 'Ảnh pixel phải có định dạng jpeg, png, jpg',
+            'svgImageUrl.mimes' => 'Ảnh svg phải có định dạng jpeg, png, jpg',
+            'outlineImageUrl.mimes' => 'Ảnh outline phải có định dạng jpeg, png, jpg',
+            'originalImageUrl.mimes' => 'Ảnh original phải có định dạng jpeg, png, jpg',
+            'colorImageUrl.mimes' => 'Ảnh color phải có định dạng jpeg, png, jpg',
+            'file.max' => 'Ảnh pixel có kích thước tối đa là 1024kb',
+            'svgImageUrl.max' => 'Ảnh svg có kích thước tối đa là 1024kb',
+            'outlineImageUrl.max' => 'Ảnh outline có kích thước tối đa là 1024kb',
+            'originalImageUrl.max' => 'Ảnh original có kích thước tối đa là 1024kb',
+            'colorImageUrl.max' => 'Ảnh color có kích thước tối đa là 1024kb',
             'position.numeric' => 'Vị trí phải là 1 số.',
             'position.min' => 'Vị trí phải lớn hơn 0.'
         ]);
@@ -222,31 +285,41 @@ class PicController extends Controller
         DB::beginTransaction();
         try {
             $item = Pic::find($id);
-            if ($request->file('file')) {
-                $file = $request->file('file');
+
+            foreach ($request->file() as $key => $file) {
                 $extends = $file->getClientOriginalExtension();
 
                 //Move Uploaded File
-                $destinationPath = 'pic/' . date('Y/m/d');
+                if($key == 'file') {
+                    $folder = 'pic/';
+                } else if($key == 'svgImageUrl'){
+                    $folder = 'svg/';
+                } else if ($key == 'outlineImageUrl') {
+                    $folder = 'outline/';
+                } else if ($key == 'originalImageUrl') {
+                    $folder = 'original/';
+                } else {
+                    $folder = 'color/';
+                }
+                $destinationPath = $folder . date('Y/m/d');
                 $name = \Str::slug($request->name) . '.' . $extends;
 
                 $path = public_path($destinationPath);
                 \File::isDirectory($path) or \File::makeDirectory($path, 0777, true, true);
 
-                $request->file('file')->move($path, $name);
-                $item->file = $destinationPath . '/' . $name;
+                $file->move($path, $name);
+                $item->$key = $destinationPath . '/' . $name;
 
-                if ($file->getClientOriginalExtension() != 'gif') {
-                    // copy($file->getRealPath(), $destination);
-                    ImageManagerStatic::configure(array('driver' => 'imagick'));
-                    // open an image file
-                    $img = ImageManagerStatic::make($path . '/' . $name);
-                    // resize image instance
-                    $img->resize(600, 600);
-                    $img->save($path . '/' . $name);
-                }
+//                if ($file->getClientOriginalExtension() != 'gif') {
+//                    // copy($file->getRealPath(), $destination);
+//                    ImageManagerStatic::configure(array('driver' => 'imagick'));
+//                    // open an image file
+//                    $img = ImageManagerStatic::make($path . '/' . $name);
+//                    // resize image instance
+//                    $img->resize(600, 600);
+//                    $img->save($path . '/' . $name);
+//                }
             }
-
             $item->name = $request->name;
             $position = $request->position == '' ? null : $request->position;
             $item->position = $position;
@@ -420,11 +493,11 @@ class PicController extends Controller
                 'x' => $point['x'] + $i,
                 'y' => $point['y'] + $i
             ];
-            if(imagecolorat($resource,$a['x'], $a['y']) == 0
+            if (imagecolorat($resource, $a['x'], $a['y']) == 0
                 || $a['x'] == 0
                 || $a['y'] == 0
                 || $a['x'] == $width
-                || $a['y'] == $height){
+                || $a['y'] == $height) {
                 $result = $a;
                 break;
             }
@@ -432,11 +505,11 @@ class PicController extends Controller
                 'x' => $point['x'] + $i,
                 'y' => $point['y'] - $i
             ];
-            if(imagecolorat($resource,$b['x'] , $b['y']) == 0
+            if (imagecolorat($resource, $b['x'], $b['y']) == 0
                 || $b['x'] == 0
                 || $b['y'] == 0
                 || $b['x'] == $width
-                || $b['y'] == $height){
+                || $b['y'] == $height) {
                 $result = $b;
                 break;
             }
@@ -444,11 +517,11 @@ class PicController extends Controller
                 'x' => $point['x'] - $i,
                 'y' => $point['y'] + $i
             ];
-            if(imagecolorat($resource,$c['x'] , $c['y']) == 0
+            if (imagecolorat($resource, $c['x'], $c['y']) == 0
                 || $c['x'] == 0
                 || $c['y'] == 0
                 || $c['x'] == $width
-                || $c['y'] == $height){
+                || $c['y'] == $height) {
                 $result = $c;
                 break;
             }
@@ -457,37 +530,37 @@ class PicController extends Controller
                 'y' => $point['y'] - $i
 
             ];
-            if(imagecolorat($resource,$d['x'] , $d['y']) == 0
+            if (imagecolorat($resource, $d['x'], $d['y']) == 0
                 || $d['x'] == 0
                 || $d['y'] == 0
                 || $d['x'] == $width
-                || $d['y'] == $height){
+                || $d['y'] == $height) {
                 $result = $d;
                 break;
             }
             for ($j = 1; $j < $i * 2; $j++) {
-                if(imagecolorat($resource,$a['x'] - $j, $a['y']) == 0){
+                if (imagecolorat($resource, $a['x'] - $j, $a['y']) == 0) {
                     $result = [
                         'x' => $a['x'] - $j,
                         'y' => $a['y']
                     ];
                     break;
                 }
-                if(imagecolorat($resource,$a['x'], $a['y']  - $j) == 0){
+                if (imagecolorat($resource, $a['x'], $a['y'] - $j) == 0) {
                     $result = [
                         'x' => $a['x'],
                         'y' => $a['y'] - $j
                     ];
                     break;
                 }
-                if(imagecolorat($resource,$b['x'] - $j, $b['y']) == 0){
+                if (imagecolorat($resource, $b['x'] - $j, $b['y']) == 0) {
                     $result = [
                         'x' => $b['x'] - $j,
                         'y' => $b['y']
                     ];
                     break;
                 }
-                if(imagecolorat($resource,$c['x'],$c['y'] - $j) == 0){
+                if (imagecolorat($resource, $c['x'], $c['y'] - $j) == 0) {
                     $result = [
                         'x' => $b['x'] - $j,
                         'y' => $b['y']

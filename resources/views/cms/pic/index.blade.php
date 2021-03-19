@@ -46,7 +46,7 @@
                         </form>
                     </div>
                     <div class="col-md-4 col-6 text-right">
-                        <a href="/cms/pics/create">
+                        <a href="/cms/pics/create?type=2">
                             <button class="btn btn-success text-uppercase">Thêm mới</button>
                         </a>
                         <button class="btn btn-danger" id="delete-selected">Xoá mục đã chọn</button>
@@ -91,20 +91,24 @@
                                 <th class="text-center">Id</th>
                                 <th>Vị trí</th>
                                 <th>Tên</th>
+                                <th>Loại ảnh</th>
                                 <th>Thể loại</th>
                                 <th>Chủ đề</th>
-                                <th>Hình ảnh</th>
-                                <th>Ngày tạo</th>
+                                <th>Ảnh pixel</th>
+                                <th>Ảnh svg</th>
+                                <th>Ảnh outline</th>
+                                <th>Ảnh original</th>
+                                <th>Ảnh color</th>
                                 <th>Thao tác</th>
                             </tr>
                             </thead>
                             <tbody>
                             @foreach($list as $item)
                                 <tr>
-                                    <td class="text-center"><input type="checkbox" class="form-check product-checkbox"
+                                    <td class="text-center" ><input type="checkbox" class="form-check product-checkbox"
                                                                    value="{{$item->id}}" name="selected[]"></td>
                                     <td class="text-center">{{$item->id}}</td>
-                                    <td style="width: 20%">
+                                    <td style="width: 10%">
                                         <form
                                             action="/cms/pics/{{  $item->id  }}/updatePosition"
                                             method="POST">
@@ -114,12 +118,24 @@
                                         </form>
                                     </td>
                                     <td>{{ $item->name }}</td>
+                                    <td>{{ config('global.pic_type')[$item->type] }}</td>
                                     <td>{{ $item->category }}</td>
                                     <td>{{ $item->theme}}</td>
                                     <td class="text-center">
                                         <img src="{{$item->getFileUrl()}}" style="width: auto; height:70px;">
                                     </td>
-                                    <td>{{date_format($item->created_at, 'Y-m-d H:i:s')}}</td>
+                                    <td class="text-center">
+                                        <img src="{{$item->getSvgImageUrl()}}" style="width: auto; height:70px;">
+                                    </td>
+                                    <td class="text-center">
+                                        <img src="{{$item->getOutlineImageUrl()}}" style="width: auto; height:70px;">
+                                    </td>
+                                    <td class="text-center">
+                                        <img src="{{$item->getOriginalImageUrl()}}" style="width: auto; height:70px;">
+                                    </td>
+                                    <td class="text-center">
+                                        <img src="{{$item->getColorImageUrl()}}" style="width: auto; height:70px;">
+                                    </td>
                                     <td>
                                         <div class="row">
                                             <div class="col-6 text-center">

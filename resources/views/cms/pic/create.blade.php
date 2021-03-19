@@ -20,6 +20,21 @@
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-group">
+                                <label>Loại hình ảnh (*):</label>
+                                <select name="type" id="type" class="form-control">
+                                    @foreach($type as $key => $i)
+                                        <option {{old('type',$currentType) == $key ? 'selected' : ''}} value="{{$key}}">{{$i}}</option>
+                                    @endforeach
+                                </select>
+                                @error('type')
+                                <p class="err" style="color: red">{{ $message }}</p>
+                                @enderror
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
                                 <label>Tên (*):</label>
                                 <input class="form-control" name="name" value="{{old('name')}}" maxlength="255">
                                 @error('name')
@@ -68,21 +83,82 @@
                             </div>
                         </div>
                     </div>
+                    @if($currentType)
+                        @if($currentType == 2)
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-group">
-                                <label for="file">Hình ảnh (*):</label>
+                                <label for="file">Ảnh Pixel:</label>
                                 <input style="display: none" type="file" name="file" class="form-control-file" id="file" accept="image/png,image/jpg,image/jpeg">
                                 <div>
-                                <button type="button" class="btn btn-primary choose-file">Chọn tệp</button>
+                                    <button type="button" class="btn btn-primary choose-file">Chọn tệp</button>
                                 </div>
-                                @error('file')
+                                @error('svgImageUrl')
                                 <p class="err" style="color: red">{{ $message }}</p>
                                 @enderror
-                                <img style="max-width: 200px; margin: 20px 0;" id="blah" src=""/>
+                                <img style="max-width: 200px; margin: 20px 0;" id="file-img" src=""/>
                             </div>
                         </div>
                     </div>
+                        @else
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="file">Ảnh svg:</label>
+                                <input style="display: none" type="file" name="svgImageUrl" class="form-control-file" id="svgImageUrl" accept="image/png,image/jpg,image/jpeg">
+                                <div>
+                                <button type="button" class="btn btn-primary choose-file">Chọn tệp</button>
+                                </div>
+                                @error('svgImageUrl')
+                                <p class="err" style="color: red">{{ $message }}</p>
+                                @enderror
+                                <img style="max-width: 200px; margin: 20px 0;" id="svg" src=""/>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="file">Ảnh outline:</label>
+                                <input style="display: none" type="file" name="outlineImageUrl" class="form-control-file" id="outlineImageUrl" accept="image/png,image/jpg,image/jpeg">
+                                <div>
+                                    <button type="button" class="btn btn-primary choose-file">Chọn tệp</button>
+                                </div>
+                                @error('outlineImageUrl')
+                                <p class="err" style="color: red">{{ $message }}</p>
+                                @enderror
+                                <img style="max-width: 200px; margin: 20px 0;" id="outline" src=""/>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="file">Ảnh original:</label>
+                                <input style="display: none" type="file" name="originalImageUrl" class="form-control-file" id="originalImageUrl" accept="image/png,image/jpg,image/jpeg">
+                                <div>
+                                    <button type="button" class="btn btn-primary choose-file">Chọn tệp</button>
+                                </div>
+                                @error('originalImageUrl')
+                                <p class="err" style="color: red">{{ $message }}</p>
+                                @enderror
+                                <img style="max-width: 200px; margin: 20px 0;" id="original" src=""/>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="file">Ảnh color:</label>
+                                <input style="display: none" type="file" name="colorImageUrl" class="form-control-file" id="colorImageUrl" accept="image/png,image/jpg,image/jpeg">
+                                <div>
+                                    <button type="button" class="btn btn-primary choose-file">Chọn tệp</button>
+                                </div>
+                                @error('colorImageUrl')
+                                <p class="err" style="color: red">{{ $message }}</p>
+                                @enderror
+                                <img style="max-width: 200px; margin: 20px 0;" id="color" src=""/>
+                            </div>
+                        </div>
+                    </div>
+                        @endif
+                    @endif
                     <div class="form-group">
                         <a href="/cms/pics">
                             <button type="button" class="btn btn-primary text-uppercase">Quay Lại</button>
@@ -97,21 +173,32 @@
 @section('script')
     <script>
         $('#file').change(function () {
-            readURL(this);
+            readURL(this, '#file-img');
         });
-
-        function readURL(input) {
+        $('#svgImageUrl').change(function () {
+            readURL(this, '#svg');
+        });
+        $('#outlineImageUrl').change(function () {
+            readURL(this, '#outline');
+        });
+        $('#originalImageUrl').change(function () {
+            readURL(this, '#original');
+        });
+        $('#colorImageUrl').change(function () {
+            readURL(this, '#color');
+        });
+        function readURL(input, id) {
             if (input.files && input.files[0]) {
                 var reader = new FileReader();
 
                 reader.onload = function (e) {
-                    $('#blah')
+                    $(id)
                         .attr('src', e.target.result);
                 };
 
                 reader.readAsDataURL(input.files[0]);
             } else {
-                $('#blah')
+                $(id)
                     .attr('src', '');
             }
         }
@@ -131,6 +218,9 @@
         $(".choose-file").click(function () {
             $(this).parent().parent().find('.err').remove();
             $(this).parent().prev().trigger('click');
+        });
+        $('#type').change(function (){
+            window.location.href = '/cms/pics/create?type=' + $(this).val();
         });
     </script>
 @endsection

@@ -31,6 +31,19 @@
                 <div class="row">
                     <div class="col-md-6">
                         <div class="form-group">
+                            <label>Loại danh mục:</label>
+                            <select disabled name="picType" id="picType" class="form-control">
+                                @foreach($picType as $key => $type)
+                                    <option
+                                        value="{{$key}}" {{$item->pic_type == $key ? 'selected' : ''}}>{{$type}}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
                             <label>Id:</label>
                             <input class="form-control" name="id" value="{{ $item->id }}" disabled>
                         </div>

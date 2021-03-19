@@ -38,7 +38,8 @@ class CategoryController extends Controller
     public function create()
     {
         $categoryType = config('global.categories_type');
-        return view('cms.category.create', ['categoryType' => $categoryType]);
+        $picType = config('global.pic_type');
+        return view('cms.category.create', ['categoryType' => $categoryType, 'picType' => $picType]);
     }
 
     public function store(Request $request)
@@ -47,6 +48,7 @@ class CategoryController extends Controller
             'name' => 'required',
             'position' => 'numeric|min:1|nullable',
             'type' => 'required',
+            'picType' => 'required',
             'avatar' => 'file|mimes:jpeg,png,jpg|max:1024',
             'cover' => 'file|mimes:jpeg,png,jpg|max:1024'
         ], [
@@ -54,6 +56,7 @@ class CategoryController extends Controller
             'position.numeric' => 'Vị trí phải là 1 số.',
             'position.min' => 'Vị trí phải lớn hơn 0.',
             'type.required' => 'Bắt buộc phải chọn danh mục.',
+            'picType.required' => 'Bắt buộc phải chọn loại danh mục.',
             'avatar.file' => 'Ảnh đại diện phải có định dạng jpeg, png, jpg',
             'avatar.mimes' => 'Ảnh đại diện phải có định dạng jpeg, png, jpg',
             'avatar.max' => 'Ảnh đại diện có kích thước tối đa là 1024kb',
@@ -66,6 +69,7 @@ class CategoryController extends Controller
         $position = $request->position == '' ? null : $request->position;
         $item->position = $position;
         $item->type = $request->type;
+        $item->pic_type = $request->picType;
         if ($request->type == 2){
             if ($request->file('avatar')) {
                 $fileAvatar = $request->file('avatar');
@@ -81,15 +85,15 @@ class CategoryController extends Controller
                 $request->file('avatar')->move($pathAvatar, $nameAvatar);
                 $item->avatar = $destinationPathAvatar . '/' . $nameAvatar;
 
-                if ($fileAvatar->getClientOriginalExtension() != 'gif') {
-                    // copy($file->getRealPath(), $destination);
-                    ImageManagerStatic::configure(array('driver' => 'imagick'));
-                    // open an image file
-                    $imgAvatar = ImageManagerStatic::make($pathAvatar . '/' . $nameAvatar);
-                    // resize image instance
-                    $imgAvatar->resize(600, 600);
-                    $imgAvatar->save($pathAvatar . '/' . $nameAvatar);
-                }
+//                if ($fileAvatar->getClientOriginalExtension() != 'gif') {
+//                    // copy($file->getRealPath(), $destination);
+//                    ImageManagerStatic::configure(array('driver' => 'imagick'));
+//                    // open an image file
+//                    $imgAvatar = ImageManagerStatic::make($pathAvatar . '/' . $nameAvatar);
+//                    // resize image instance
+//                    $imgAvatar->resize(600, 600);
+//                    $imgAvatar->save($pathAvatar . '/' . $nameAvatar);
+//                }
             }
             if ($request->file('cover')) {
                 $file = $request->file('cover');
@@ -124,16 +128,18 @@ class CategoryController extends Controller
     public function detail($id)
     {
         $categoryType = config('global.categories_type');
+        $picType = config('global.pic_type');
         $item = Category::find($id);
 
-        return view('cms.category.detail', ['item' => $item, 'categoryType' => $categoryType]);
+        return view('cms.category.detail', ['item' => $item, 'categoryType' => $categoryType, 'picType' => $picType]);
     }
 
     public function edit($id)
     {
         $categoryType = config('global.categories_type');
+        $picType = config('global.pic_type');
         $item = Category::find($id);
-        return view('cms.category.edit', ['item' => $item, 'categoryType' => $categoryType]);
+        return view('cms.category.edit', ['item' => $item, 'categoryType' => $categoryType, 'picType' => $picType]);
     }
 
     public function update(Request $request, $id)
@@ -142,6 +148,7 @@ class CategoryController extends Controller
             'name' => 'required',
             'position' => 'numeric|min:1|nullable',
             'type' => 'required',
+            'picType' => 'required',
             'avatar' => 'file|mimes:jpeg,png,jpg|max:1024',
             'cover' => 'file|mimes:jpeg,png,jpg|max:1024'
         ], [
@@ -149,6 +156,7 @@ class CategoryController extends Controller
             'position.numeric' => 'Vị trí phải là 1 số.',
             'position.min' => 'Vị trí phải lớn hơn 0.',
             'type.required' => 'Bắt buộc phải chọn danh mục.',
+            'picType.required' => 'Bắt buộc phải chọn loại danh mục.',
             'avatar.file' => 'Ảnh đại diện phải có định dạng jpeg, png, jpg',
             'avatar.mimes' => 'Ảnh đại diện phải có định dạng jpeg, png, jpg',
             'avatar.max' => 'Ảnh đại diện có kích thước tối đa là 1024kb',
@@ -162,6 +170,7 @@ class CategoryController extends Controller
         $position = $request->position == '' ? null : $request->position;
         $item->position = $position;
         $item->type = $request->type;
+        $item->pic_type = $request->picType;
         if ($request->type == 2){
             if ($request->file('avatar')) {
                 $fileAvatar = $request->file('avatar');
@@ -177,15 +186,15 @@ class CategoryController extends Controller
                 $request->file('avatar')->move($pathAvatar, $nameAvatar);
                 $item->avatar = $destinationPathAvatar . '/' . $nameAvatar;
 
-                if ($fileAvatar->getClientOriginalExtension() != 'gif') {
-                    // copy($file->getRealPath(), $destination);
-                    ImageManagerStatic::configure(array('driver' => 'imagick'));
-                    // open an image file
-                    $imgAvatar = ImageManagerStatic::make($pathAvatar . '/' . $nameAvatar);
-                    // resize image instance
-                    $imgAvatar->resize(600, 600);
-                    $imgAvatar->save($pathAvatar . '/' . $nameAvatar);
-                }
+//                if ($fileAvatar->getClientOriginalExtension() != 'gif') {
+//                    // copy($file->getRealPath(), $destination);
+//                    ImageManagerStatic::configure(array('driver' => 'imagick'));
+//                    // open an image file
+//                    $imgAvatar = ImageManagerStatic::make($pathAvatar . '/' . $nameAvatar);
+//                    // resize image instance
+//                    $imgAvatar->resize(600, 600);
+//                    $imgAvatar->save($pathAvatar . '/' . $nameAvatar);
+//                }
             }
             if ($request->file('cover')) {
                 $file = $request->file('cover');
@@ -201,15 +210,15 @@ class CategoryController extends Controller
                 $request->file('cover')->move($path, $name);
                 $item->cover = $destinationPath . '/' . $name;
 
-                if ($file->getClientOriginalExtension() != 'gif') {
-                    // copy($file->getRealPath(), $destination);
-                    ImageManagerStatic::configure(array('driver' => 'imagick'));
-                    // open an image file
-                    $img = ImageManagerStatic::make($path . '/' . $name);
-                    // resize image instance
-                    $img->resize(600, 600);
-                    $img->save($path . '/' . $name);
-                }
+//                if ($file->getClientOriginalExtension() != 'gif') {
+//                    // copy($file->getRealPath(), $destination);
+//                    ImageManagerStatic::configure(array('driver' => 'imagick'));
+//                    // open an image file
+//                    $img = ImageManagerStatic::make($path . '/' . $name);
+//                    // resize image instance
+//                    $img->resize(600, 600);
+//                    $img->save($path . '/' . $name);
+//                }
             }
         }
         $item->save();
