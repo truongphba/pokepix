@@ -157,15 +157,15 @@ class PicController extends Controller
                 $file->move($path, $name);
                 $item->$key = $destinationPath . '/' . $name;
 
-//                if ($file->getClientOriginalExtension() != 'gif') {
-//                    // copy($file->getRealPath(), $destination);
-//                    ImageManagerStatic::configure(array('driver' => 'imagick'));
-//                    // open an image file
-//                    $img = ImageManagerStatic::make($path . '/' . $name);
-//                    // resize image instance
-//                    $img->resize(600, 600);
-//                    $img->save($path . '/' . $name);
-//                }
+                if ($file->getClientOriginalExtension() != 'gif') {
+                    // copy($file->getRealPath(), $destination);
+                    ImageManagerStatic::configure(array('driver' => 'imagick'));
+                    // open an image file
+                    $img = ImageManagerStatic::make($path . '/' . $name);
+                    // resize image instance
+                    $img->resize(600, 600);
+                    $img->save($path . '/' . $name);
+                }
             }
 
             $item->name = $request->name;
@@ -310,15 +310,15 @@ class PicController extends Controller
                 $file->move($path, $name);
                 $item->$key = $destinationPath . '/' . $name;
 
-//                if ($file->getClientOriginalExtension() != 'gif') {
-//                    // copy($file->getRealPath(), $destination);
-//                    ImageManagerStatic::configure(array('driver' => 'imagick'));
-//                    // open an image file
-//                    $img = ImageManagerStatic::make($path . '/' . $name);
-//                    // resize image instance
-//                    $img->resize(600, 600);
-//                    $img->save($path . '/' . $name);
-//                }
+                if ($file->getClientOriginalExtension() != 'gif') {
+                    // copy($file->getRealPath(), $destination);
+                    ImageManagerStatic::configure(array('driver' => 'imagick'));
+                    // open an image file
+                    $img = ImageManagerStatic::make($path . '/' . $name);
+                    // resize image instance
+                    $img->resize(600, 600);
+                    $img->save($path . '/' . $name);
+                }
             }
             $item->name = $request->name;
             $position = $request->position == '' ? null : $request->position;
