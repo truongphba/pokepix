@@ -11,6 +11,7 @@ use App\Http\Requests\API\Post\CreatePostRequest;
 use App\Http\Requests\API\Post\CommentPostRequest;
 use App\Models\Pic;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Intervention\Image\ImageManagerStatic;
 
 class ImageController extends Controller
@@ -45,7 +46,11 @@ class ImageController extends Controller
 
     public function info($id)
     {
-        $post = Image::withCount('likes', 'comments')->findOrFail((int)$id);
+        $post = Image::selectRaw('images.*, IFNULL(lk.likes_count,0) likes_count, IFNULL(comments_count, 0 ) comments_count')
+            ->leftjoin(DB::Raw('(select image_id,count(*) likes_count from `likes` group by image_id) lk'), 'lk.image_id', '=', 'images.id')
+            ->leftjoin(DB::Raw('(select image_id,count(*) comments_count from `comments` group by image_id) cm'), 'cm.image_id', '=', 'images.id')
+            ->findOrFail((int)$id);
+//        $post = Image::withCount('likes', 'comments')->findOrFail((int)$id);
         return response()->json(['data' => $post], 200);
     }
 
