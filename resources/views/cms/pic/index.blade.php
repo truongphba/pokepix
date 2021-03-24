@@ -74,6 +74,16 @@
                             @endforeach
                         </select>
                     </div>
+                    <div class="col-md-3">
+                        <label>Lọc theo loại ảnh: </label>
+                        <select name="pic_type" id="picTypeFilter" class="form-control">
+                            <option value="">Tất cả</option>
+                            @foreach($picType as $key => $type)
+                                <option
+                                    value="{{$key}}" {{ $currentPicType == $key ? 'selected' : ''}}>{{$type}}</option>
+                            @endforeach
+                        </select>
+                    </div>
                     <div class="col-md-2" style="position: relative;">
                         <button class="btn btn-primary" id="filter" style="position: absolute; bottom: 0;">Lọc</button>
                     </div>
@@ -203,10 +213,11 @@
                 window.location.href = '/cms/pics/' + $(this).children().first().next().text();
             });
             $('#filter').click(function () {
-                let category_id = $('#categoryFilter').val();
-                let theme_id = $('#themeFilter').val();
-                let keyword = $('#keyword').val();
-                window.location.href = '/cms/pics?category_id=' + category_id + '&theme_id=' + theme_id + '&keyword=' + keyword;
+                const category_id = $('#categoryFilter').val();
+                const theme_id = $('#themeFilter').val();
+                const pic_type = $('#picTypeFilter').val();
+                const keyword = $('#keyword').val();
+                window.location.href = '/cms/pics?category_id=' + category_id + '&theme_id=' + theme_id + '&pic_type=' + pic_type + '&keyword=' + keyword;
             })
             $('#check-all').click(function () {
                 $('.product-checkbox').prop('checked', $(this).prop('checked'));

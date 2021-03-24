@@ -19,7 +19,8 @@ class CategoryController extends Controller
     {
         $categoryType = config('global.categories_type');
 
-
+        $currentPicType = $request->pic_type;
+        $picType = config('global.pic_type');
         $keyword = $request->get('keyword');
         $list = Category::query();
         $currentType = null;
@@ -27,12 +28,15 @@ class CategoryController extends Controller
             $currentType = $request->type;
             $list = $list->where('type', $request->type);
         }
+        if ($currentPicType) {
+            $list = $list->where('pic_type',$currentPicType);
+        }
         $list = $list->orderByRaw('ISNULL(position), position ASC')->orderBy('created_at', 'DESC')->where(function ($query) use ($keyword) {
             $query->where('name', 'like', '%' . $keyword . '%')
                 ->orWhere('id', $keyword);
         })->paginate(10)->appends($request->only('keyword'))->appends($request->only('type'));
 
-        return view('cms.category.index', ['list' => $list, 'keyword' => $keyword, 'categoryType' => $categoryType, 'currentType' => $currentType]);
+        return view('cms.category.index', ['list' => $list, 'keyword' => $keyword, 'categoryType' => $categoryType, 'currentType' => $currentType, 'picType' => $picType,'currentPicType' => $currentPicType]);
     }
 
     public function create()

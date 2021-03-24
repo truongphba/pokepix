@@ -1,7 +1,6 @@
 <?php
-
 namespace App\Http\Controllers\Cms;
-
+set_time_limit(0);
 use App\Models\Category;
 use App\Models\Pic;
 use App\Models\Theme;
@@ -9,6 +8,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\DB;
 use Intervention\Image\ImageManagerStatic;
+use Monolog\Logger;
 
 class PicController extends Controller
 {
@@ -22,6 +22,9 @@ class PicController extends Controller
         $keyword = $request->get('keyword');
         $currentThemeId = $request->theme_id;
         $currentCategoryId = $request->category_id;
+        $currentPicType = $request->pic_type;
+        $picType = config('global.pic_type');
+        unset($picType[1]);
         $filter = [];
         if ($currentThemeId) {
             $filter[] = $currentThemeId;
@@ -39,6 +42,9 @@ class PicController extends Controller
             $list = $list->whereHas('categories', function ($query) use ($filter) {
                 $query->whereIn('category_id', $filter);
             });
+        }
+        if ($currentPicType) {
+            $list = $list->where('type',$currentPicType);
         }
         $list = $list->paginate(10)->appends($request->only('keyword'))->appends($request->only('category_id'))->appends($request->only('theme_id'));
         foreach ($list as $item) {
@@ -69,6 +75,8 @@ class PicController extends Controller
                 'categories' => $categories,
                 'currentThemeId' => $currentThemeId,
                 'currentCategoryId' => $currentCategoryId,
+                'currentPicType' => $currentPicType,
+                'picType' => $picType
             ]);
     }
 
@@ -104,7 +112,7 @@ class PicController extends Controller
             'type' => 'required',
             'file' => 'file|mimes:jpeg,png,jpg|max:1024',
             'svgImageUrl' => 'file|mimes:jpeg,png,jpg|max:1024',
-            'outlineImageUrl' => 'file|mimes:jpeg,png,jpg|max:1024',
+            'outlineImageUrl' => 'file|mimes:jpeg,png,jpg,bmp|max:1024',
             'originalImageUrl' => 'file|mimes:jpeg,png,jpg|max:1024',
             'colorImageUrl' => 'file|mimes:jpeg,png,jpg|max:1024',
             'position' => 'numeric|min:1|nullable'
@@ -118,7 +126,7 @@ class PicController extends Controller
             'colorImageUrl.file' => 'Ảnh color phải có định dạng jpeg, png, jpg',
             'file.mimes' => 'Ảnh pixel phải có định dạng jpeg, png, jpg',
             'svgImageUrl.mimes' => 'Ảnh svg phải có định dạng jpeg, png, jpg',
-            'outlineImageUrl.mimes' => 'Ảnh outline phải có định dạng jpeg, png, jpg',
+            'outlineImageUrl.mimes' => 'Ảnh outline phải có định dạng jpeg, png, jpg, bmp',
             'originalImageUrl.mimes' => 'Ảnh original phải có định dạng jpeg, png, jpg',
             'colorImageUrl.mimes' => 'Ảnh color phải có định dạng jpeg, png, jpg',
             'file.max' => 'Ảnh pixel có kích thước tối đa là 1024kb',
@@ -137,9 +145,9 @@ class PicController extends Controller
                 $extends = $file->getClientOriginalExtension();
 
                 //Move Uploaded File
-                if($key == 'file') {
+                if ($key == 'file') {
                     $folder = 'pic/';
-                } else if($key == 'svgImageUrl'){
+                } else if ($key == 'svgImageUrl') {
                     $folder = 'svg/';
                 } else if ($key == 'outlineImageUrl') {
                     $folder = 'outline/';
@@ -257,7 +265,7 @@ class PicController extends Controller
             'name' => 'required',
             'file' => 'file|mimes:jpeg,png,jpg|max:1024',
             'svgImageUrl' => 'file|mimes:jpeg,png,jpg|max:1024',
-            'outlineImageUrl' => 'file|mimes:jpeg,png,jpg|max:1024',
+            'outlineImageUrl' => 'file|mimes:jpeg,png,jpg, bmp|max:1024',
             'originalImageUrl' => 'file|mimes:jpeg,png,jpg|max:1024',
             'colorImageUrl' => 'file|mimes:jpeg,png,jpg|max:1024',
             'position' => 'numeric|min:1|nullable'
@@ -270,7 +278,7 @@ class PicController extends Controller
             'colorImageUrl.file' => 'Ảnh color phải có định dạng jpeg, png, jpg',
             'file.mimes' => 'Ảnh pixel phải có định dạng jpeg, png, jpg',
             'svgImageUrl.mimes' => 'Ảnh svg phải có định dạng jpeg, png, jpg',
-            'outlineImageUrl.mimes' => 'Ảnh outline phải có định dạng jpeg, png, jpg',
+            'outlineImageUrl.mimes' => 'Ảnh outline phải có định dạng jpeg, png, jpg, bmp',
             'originalImageUrl.mimes' => 'Ảnh original phải có định dạng jpeg, png, jpg',
             'colorImageUrl.mimes' => 'Ảnh color phải có định dạng jpeg, png, jpg',
             'file.max' => 'Ảnh pixel có kích thước tối đa là 1024kb',
@@ -290,9 +298,9 @@ class PicController extends Controller
                 $extends = $file->getClientOriginalExtension();
 
                 //Move Uploaded File
-                if($key == 'file') {
+                if ($key == 'file') {
                     $folder = 'pic/';
-                } else if($key == 'svgImageUrl'){
+                } else if ($key == 'svgImageUrl') {
                     $folder = 'svg/';
                 } else if ($key == 'outlineImageUrl') {
                     $folder = 'outline/';
@@ -399,178 +407,116 @@ class PicController extends Controller
         }
     }
 
-    public function bitmap()
+    public function processImage($id)
     {
-        function ImageCreateBMP($filename)
-        {
-//Ouverture du fichier en mode binaire
-            if (!$f1 = fopen($filename, "rb")) return FALSE;
+        $pic = Pic::find($id);
+        if (!$pic->outlineImageURL || !$pic->colorImageURL) {
+            return false;
+        }
+        $outlineBitmap = imageCreateFromPng(public_path($pic->outlineImageURL));
+        $colorBitmap = imageCreateFromPng(public_path($pic->colorImageURL));
+        $width = imagesx($outlineBitmap);
+        $height = imagesy($outlineBitmap);
 
-//1 : Chargement des ent�tes FICHIER
-            $FILE = unpack("vfile_type/Vfile_size/Vreserved/Vbitmap_offset", fread($f1, 14));
-            if ($FILE['file_type'] != 19778) return FALSE;
-
-//2 : Chargement des ent�tes BMP
-            $BMP = unpack('Vheader_size/Vwidth/Vheight/vplanes/vbits_per_pixel' .
-                '/Vcompression/Vsize_bitmap/Vhoriz_resolution' .
-                '/Vvert_resolution/Vcolors_used/Vcolors_important', fread($f1, 40));
-            $BMP['colors'] = pow(2, $BMP['bits_per_pixel']);
-            if ($BMP['size_bitmap'] == 0) $BMP['size_bitmap'] = $FILE['file_size'] - $FILE['bitmap_offset'];
-            $BMP['bytes_per_pixel'] = $BMP['bits_per_pixel'] / 8;
-            $BMP['bytes_per_pixel2'] = ceil($BMP['bytes_per_pixel']);
-            $BMP['decal'] = ($BMP['width'] * $BMP['bytes_per_pixel'] / 4);
-            $BMP['decal'] -= floor($BMP['width'] * $BMP['bytes_per_pixel'] / 4);
-            $BMP['decal'] = 4 - (4 * $BMP['decal']);
-            if ($BMP['decal'] == 4) $BMP['decal'] = 0;
-
-//3 : Chargement des couleurs de la palette
-            $PALETTE = array();
-            if ($BMP['colors'] < 16777216) {
-                $PALETTE = unpack('V' . $BMP['colors'], fread($f1, $BMP['colors'] * 4));
+        $isChecked = [];
+        for ($x = 0; $x < $height; $x++) {
+            for ($y = 0; $y < $width; $y++) {
+                $isChecked[$x][$y] = false;
             }
+        }
+        $blockList = [];
 
-//4 : Cr�ation de l'image
-            $IMG = fread($f1, $BMP['size_bitmap']);
-            $VIDE = chr(0);
+        for ($x = 0; $x < $height; $x++) {
+            for ($y = 0; $y < $width; $y++) {
+                if (!$isChecked[$x][$y] && $this->shouldBeFill($outlineBitmap, $x, $y)) {
+                    $isChecked[$x][$y] = true;
+                    $xArray = [-1, -1, -1, 0, 0, 1, 1, 1];
+                    $yArray = [-1, 0, 1, -1, 1, -1, 0, 1];
 
-            $res = imagecreatetruecolor($BMP['width'], $BMP['height']);
-            $P = 0;
-            $Y = $BMP['height'] - 1;
-            while ($Y >= 0) {
-                $X = 0;
-                while ($X < $BMP['width']) {
-                    if ($BMP['bits_per_pixel'] == 24)
-                        $COLOR = unpack("V", substr($IMG, $P, 3) . $VIDE);
-                    elseif ($BMP['bits_per_pixel'] == 16) {
-                        $COLOR = unpack("n", substr($IMG, $P, 2));
-                        $COLOR[1] = $PALETTE[$COLOR[1] + 1];
-                    } elseif ($BMP['bits_per_pixel'] == 8) {
-                        $COLOR = unpack("n", $VIDE . substr($IMG, $P, 1));
-                        $COLOR[1] = $PALETTE[$COLOR[1] + 1];
-                    } elseif ($BMP['bits_per_pixel'] == 4) {
-                        $COLOR = unpack("n", $VIDE . substr($IMG, floor($P), 1));
-                        if (($P * 2) % 2 == 0) $COLOR[1] = ($COLOR[1] >> 4); else $COLOR[1] = ($COLOR[1] & 0x0F);
-                        $COLOR[1] = $PALETTE[$COLOR[1] + 1];
-                    } elseif ($BMP['bits_per_pixel'] == 1) {
-                        $COLOR = unpack("n", $VIDE . substr($IMG, floor($P), 1));
-                        if (($P * 8) % 8 == 0) $COLOR[1] = $COLOR[1] >> 7;
-                        elseif (($P * 8) % 8 == 1) $COLOR[1] = ($COLOR[1] & 0x40) >> 6;
-                        elseif (($P * 8) % 8 == 2) $COLOR[1] = ($COLOR[1] & 0x20) >> 5;
-                        elseif (($P * 8) % 8 == 3) $COLOR[1] = ($COLOR[1] & 0x10) >> 4;
-                        elseif (($P * 8) % 8 == 4) $COLOR[1] = ($COLOR[1] & 0x8) >> 3;
-                        elseif (($P * 8) % 8 == 5) $COLOR[1] = ($COLOR[1] & 0x4) >> 2;
-                        elseif (($P * 8) % 8 == 6) $COLOR[1] = ($COLOR[1] & 0x2) >> 1;
-                        elseif (($P * 8) % 8 == 7) $COLOR[1] = ($COLOR[1] & 0x1);
-                        $COLOR[1] = $PALETTE[$COLOR[1] + 1];
-                    } else
-                        return FALSE;
-                    imagesetpixel($res, $X, $Y, $COLOR[1]);
-                    $X++;
-                    $P += $BMP['bytes_per_pixel'];
+                    $pointCount = 0;
+                    $maxSize = 0;
+                    $centerX = $x;
+                    $centerY = $y;
+                    $pointQueue = [];
+                    $point = [$x, $y];
+                    while ($point) {
+                        $pointCount++;
+                        $size = $this->getDistanceToBoundary($outlineBitmap, $point[0], $point[1], $height, $width);
+                        if ($maxSize < $size) {
+                            $maxSize = $size;
+                            $centerX = $point[0];
+                            $centerY = $point[1];
+                        }
+                        for ($i = 0; $i < 8; $i++) {
+                            $newX = $point[0] + $xArray[$i];
+                            $newY = $point[1] + $yArray[$i];
+                            if (!$isChecked[$newX][$newY]
+                                && $newX >= 0
+                                && $newX < $height
+                                && $newY >= 0
+                                && $newY < $width) {
+                                $isChecked[$newX][$newY] = true;
+                                if ($this->shouldBeFill($outlineBitmap, $newX, $newY)) {
+                                    array_unshift($pointQueue, [$newX, $newY]);
+                                }
+                            }
+                        }
+                        if (count($pointQueue) > 0) {
+                            $point = $pointQueue[0];
+                            array_shift($pointQueue);
+                        } else {
+                            $point = null;
+                        }
+                    }
+                    $block = [
+                        'centerPoint' => [
+                            'size' => $maxSize,
+                            'x' => $centerX,
+                            'y' => $centerY
+                        ],
+                        'color' => 0,
+                        'index' => 0,
+                        'pointCount' => $pointCount
+                    ];
+
+                    if ($block['centerPoint']['size'] > 1) {
+                        $blockList[] = $block;
+                        dd(json_encode($block));
+                    }
                 }
-                $Y--;
-                $P += $BMP['decal'];
             }
-
-//Fermeture du fichier
-            fclose($f1);
-
-            return $res;
         }
 
-        $resource = ImageCreateBMP(public_path('test.bmp'));
-        $width = imagesx($resource);
-        $height = imagesy($resource);
-        $point = [
-            'x' => 500,
-            'y' => 500
-        ];
+        dd($blockList);
+    }
 
-        $i = 1;
-        $result = [];
+    private function shouldBeFill($resource, $x, $y)
+    {
+        $rgb = imagecolorat($resource, $x, $y);
+        $red = imagecolorsforindex($resource, $rgb)['red'];
+        $green = imagecolorsforindex($resource, $rgb)['green'];
+        $blue = imagecolorsforindex($resource, $rgb)['blue'];
+
+        $colorFromFRG = 0.2989 * $red + 0.5870 * $green + 0.1140 * $blue;
+
+        if ($red == $green && $green == $blue && $colorFromFRG >= 150) {
+            return true;
+        }
+        return false;
+    }
+
+    private function getDistanceToBoundary($resource, $x, $y, $height, $width)
+    {
+        $size = 1;
         while (true) {
-            $a = [
-                'x' => $point['x'] + $i,
-                'y' => $point['y'] + $i
-            ];
-            if (imagecolorat($resource, $a['x'], $a['y']) == 0
-                || $a['x'] == 0
-                || $a['y'] == 0
-                || $a['x'] == $width
-                || $a['y'] == $height) {
-                $result = $a;
-                break;
-            }
-            $b = [
-                'x' => $point['x'] + $i,
-                'y' => $point['y'] - $i
-            ];
-            if (imagecolorat($resource, $b['x'], $b['y']) == 0
-                || $b['x'] == 0
-                || $b['y'] == 0
-                || $b['x'] == $width
-                || $b['y'] == $height) {
-                $result = $b;
-                break;
-            }
-            $c = [
-                'x' => $point['x'] - $i,
-                'y' => $point['y'] + $i
-            ];
-            if (imagecolorat($resource, $c['x'], $c['y']) == 0
-                || $c['x'] == 0
-                || $c['y'] == 0
-                || $c['x'] == $width
-                || $c['y'] == $height) {
-                $result = $c;
-                break;
-            }
-            $d = [
-                'x' => $point['x'] - $i,
-                'y' => $point['y'] - $i
-
-            ];
-            if (imagecolorat($resource, $d['x'], $d['y']) == 0
-                || $d['x'] == 0
-                || $d['y'] == 0
-                || $d['x'] == $width
-                || $d['y'] == $height) {
-                $result = $d;
-                break;
-            }
-            for ($j = 1; $j < $i * 2; $j++) {
-                if (imagecolorat($resource, $a['x'] - $j, $a['y']) == 0) {
-                    $result = [
-                        'x' => $a['x'] - $j,
-                        'y' => $a['y']
-                    ];
-                    break;
-                }
-                if (imagecolorat($resource, $a['x'], $a['y'] - $j) == 0) {
-                    $result = [
-                        'x' => $a['x'],
-                        'y' => $a['y'] - $j
-                    ];
-                    break;
-                }
-                if (imagecolorat($resource, $b['x'] - $j, $b['y']) == 0) {
-                    $result = [
-                        'x' => $b['x'] - $j,
-                        'y' => $b['y']
-                    ];
-                    break;
-                }
-                if (imagecolorat($resource, $c['x'], $c['y'] - $j) == 0) {
-                    $result = [
-                        'x' => $b['x'] - $j,
-                        'y' => $b['y']
-                    ];
-                    break;
+            for ($i = $x - $size; $i < $x + $size; $i++) {
+                for ($j = $y - $size; $j < $y + $size; $j++) {
+                    if ($i < 0 || $i >= $height || $j < 0 || $j >= $width || !$this->shouldBeFill($resource, $x, $y)) {
+                        return $size;
+                    }
                 }
             }
-            if ($result) break;
-            $i++;
+            $size++;
         }
-        dd($i);
     }
 }

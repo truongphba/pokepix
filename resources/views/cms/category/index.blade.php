@@ -40,7 +40,7 @@
                         <form action="/cms/categories" method="GET"
                               class="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100 navbar-search">
                             <div class="input-group">
-                                <input type="text" class="form-control border-0 small" name="keyword"
+                                <input type="text" class="form-control border-0 small" name="keyword" id="keyword"
                                        value="{{ $keyword }}" placeholder="Tìm kiếm...." aria-label="Search"
                                        aria-describedby="basic-addon2">
                                 <input type="hidden" name="type" value="{{$currentType}}">
@@ -56,6 +56,22 @@
                         <a href="/cms/categories/create">
                             <button class="btn btn-success text-uppercase">Thêm mới</button>
                         </a>
+                    </div>
+                </div>
+                <hr class="mt-2 mb-2">
+                <div class="row">
+                    <div class="col-md-3">
+                        <label>Lọc theo loại danh mục: </label>
+                        <select name="pic_type" id="picTypeFilter" class="form-control">
+                            <option value="">Tất cả</option>
+                            @foreach($picType as $key => $type)
+                                <option
+                                    value="{{$key}}" {{ $currentPicType == $key ? 'selected' : ''}}>{{$type}}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="col-md-2" style="position: relative;">
+                        <button class="btn btn-primary" id="filter" style="position: absolute; bottom: 0;">Lọc</button>
                     </div>
                 </div>
             </div>
@@ -185,6 +201,13 @@
             const id = $(this).attr('data')
             $('#delete-confirm form').attr('action','/cms/categories/' + id + '/delete')
             $('#delete-confirm').modal('show')
+        })
+
+        $('#filter').click(function () {
+            const pic_type = $('#picTypeFilter').val();
+            const keyword = $('#keyword').val();
+            const type = $('#type').val();
+            window.location.href = '/cms/categories?type=' + type + '&keyword=' + keyword + '&pic_type=' + pic_type;
         })
     </script>
 @endsection

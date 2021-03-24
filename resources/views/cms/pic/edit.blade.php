@@ -11,7 +11,15 @@
         <div class="card shadow mb-4">
             <div class="card-header py-3">
                 <div class="row">
-                    <h4 class="m-0 font-weight-bold text-primary">Sửa Hình Ảnh</h4>
+                    <div class="col-md-6">
+                        <h4 class="m-0 font-weight-bold text-primary">Sửa Hình Ảnh</h4>
+                    </div>
+                    <div class="col-md-6">
+                        <form action="/cms/pics/{{ $item->id }}/process-image" method="POST">
+                            @csrf
+                            <button class="btn btn-primary float-right">Xử lý ảnh</button>
+                        </form>
+                    </div>
                 </div>
             </div>
             <div class="card-body">

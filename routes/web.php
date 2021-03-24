@@ -43,6 +43,7 @@ Route::prefix('pics')->group(function () {
     Route::post('/{id}/updatePosition', 'PicController@updatePosition');
     Route::delete('/{id}/delete', 'PicController@delete');
     Route::post('/delete-selected', 'PicController@deleteSelected');
+    Route::post('/{id}/process-image','PicController@processImage');
 });
 Route::get('/login', 'AuthController@login');
 Route::post('/login', 'AuthController@loginProcess');
@@ -50,5 +51,3 @@ Route::get('/logout', 'AuthController@logout');
 Route::get('/index', function(){
     return redirect('/cms/users');
 });
-Route::get('/bitmap', 'PicController@bitmap');
-
