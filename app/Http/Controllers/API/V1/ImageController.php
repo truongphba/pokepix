@@ -167,7 +167,7 @@ class ImageController extends Controller
                 $query->where('category_id', $id)
                     ->where('categories.type', 1);
             })
-            ->get();
+            ->paginate(100);
 
         foreach ($list as $key => $item) {
             $item->category = '';
@@ -182,6 +182,7 @@ class ImageController extends Controller
                 }
             }
             unset($list[$key]->categories);
+            unset($list[$key]->image_data);
         }
 
         return response()->json(['data'  => $list], 200);
@@ -195,7 +196,7 @@ class ImageController extends Controller
                 $query->where('category_id', $id)
                     ->where('categories.type', 2);
             })
-            ->get();
+            ->paginate(100);
 
         foreach ($list as $key => $item) {
             $item->category = '';
@@ -212,9 +213,16 @@ class ImageController extends Controller
                 }
             }
             unset($list[$key]->categories);
+            unset($list[$key]->image_data);
         }
 
         return response()->json(['data'  => $list], 200);
 
+    }
+
+    public function getImageData($id) {
+        $pic = Pic::find($id);
+        $data = json_decode($pic->image_data);
+        return response()->json(['data'  => $data], 200);
     }
 }

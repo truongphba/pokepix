@@ -52,6 +52,8 @@ Route::prefix('/')->middleware('device', 'throttle:150,1')->group(function() {
 
         Route::get('/category/{id}', 'V1\ImageController@listByCategory')->middleware('user');
         Route::get('/theme/{id}', 'V1\ImageController@listByTheme')->middleware('user');
+
+        Route::get('/{id}/data', 'V1\ImageController@getImageData')->middleware('user');
     });
 
     Route::get('/category','V1\CategoryController@list')->middleware('user');

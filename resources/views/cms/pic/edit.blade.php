@@ -124,7 +124,7 @@
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="file">Ảnh svg:</label>
-                                    <input style="display: none" type="file" name="svgImageUrl" class="form-control-file" id="svgImageUrl" accept="image/png,image/jpg,image/jpeg">
+                                    <input style="display: none" type="file" name="svgImageUrl" class="form-control-file" id="svgImageUrl" accept="image/svg+xml">
                                     <div>
                                         <button type="button" class="btn btn-primary choose-file">Chọn tệp</button>
                                     </div>

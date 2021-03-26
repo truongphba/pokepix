@@ -28,13 +28,13 @@ class Pic extends Model
 
     public function getOriginalImageUrl()
     {
-        if($this->outlineImageURL) return url($this->originalImageURL);
+        if($this->originalImageURL) return url($this->originalImageURL);
         return null;
     }
 
     public function getColorImageUrl()
     {
-        if($this->outlineImageURL) return url($this->colorImageURL);
+        if($this->colorImageURL) return url($this->colorImageURL);
         return null;
     }
 
